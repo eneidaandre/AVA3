@@ -1,37 +1,24 @@
-// assets/js/app.js
-import { supabaseHealthcheck } from './supabaseClient.js';
+// assets/js/supabaseClient.js
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
-function setStatus(html) {
-  const el = document.getElementById('status');
-  if (el) el.innerHTML = html;
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.warn(
+    '⚠️ SUPABASE_URL ou SUPABASE_ANON_KEY não definidos em config.js'
+  );
 }
 
-async function main() {
-  setStatus('Conectando ao Supabase...');
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
 
-  const res = await supabaseHealthcheck();
-
-  if (!res.ok) {
-    setStatus(`
-      <b>❌ Falha ao conectar</b><br/>
-      <small>${res.message || 'Erro desconhecido'}</small>
-      <hr/>
-      <small>Dica: confira se <code>config.js</code> tem aspas em URL e KEY.</small>
-    `);
-    return;
-  }
-
-  if (res.hasSession && res.user?.email) {
-    setStatus(`
-      <b>✅ Supabase OK</b><br/>
-      Sessão ativa: <code>${res.user.email}</code>
-    `);
-  } else {
-    setStatus(`
-      <b>✅ Supabase OK</b><br/>
-      Sessão: <code>não logado</code>
-    `);
-  }
+// Health check que não depende de tabela/RLS
+export async function supabaseHealthCheck() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, hasSession: !!data?.session };
 }
-
-main();

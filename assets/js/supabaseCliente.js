@@ -2,38 +2,23 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
-// ✅ Cliente único do Supabase (front-end / GitHub Pages)
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.warn(
+    '⚠️ SUPABASE_URL ou SUPABASE_ANON_KEY não definidos em config.js'
+  );
+}
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    persistSession: true, // mantém logado (localStorage)
-    autoRefreshToken: true, // renova token automaticamente
-    detectSessionInUrl: true, // captura sessão quando voltar de login por link/oauth
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
   },
 });
 
-// (Opcional) ajuda no debug pelo Console do navegador:
-window.supabase = supabase;
-
-/**
- * Healthcheck simples (não depende de tabelas)
- * - Se retornar ok:true, significa que o client foi criado e o auth responde.
- */
-export async function supabaseHealthcheck() {
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) throw error;
-
-    return {
-      ok: true,
-      hasSession: !!data?.session,
-      user: data?.session?.user
-        ? {
-            id: data.session.user.id,
-            email: data.session.user.email,
-          }
-        : null,
-    };
-  } catch (e) {
-    return { ok: false, message: e?.message || String(e) };
-  }
+// Health check que não depende de tabela/RLS
+export async function supabaseHealthCheck() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, hasSession: !!data?.session };
 }
