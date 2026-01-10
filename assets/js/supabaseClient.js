@@ -2,12 +2,6 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.warn(
-    '⚠️ SUPABASE_URL ou SUPABASE_ANON_KEY não definidos em config.js'
-  );
-}
-
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: true,
@@ -16,16 +10,20 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
 });
 
-// Health check que não depende de tabela/RLS
-export async function supabaseHealthCheck() {
+export async function getSessionSafe() {
   const { data, error } = await supabase.auth.getSession();
-  if (error) return { ok: false, error: error.message };
-  return { ok: true, hasSession: !!data?.session };
-}
-export function supabaseUrl() {
-  return SUPABASE_URL;
+  if (error) return { session: null, error: error.message };
+  return { session: data?.session || null, error: null };
 }
 
-export function supabaseAnonKey() {
-  return SUPABASE_ANON_KEY;
+export function getUserDisplayName(session) {
+  if (!session?.user) return '';
+  const u = session.user;
+
+  // tenta nome primeiro (mais interessante)
+  const meta = u.user_metadata || {};
+  const name =
+    meta.full_name || meta.name || meta.nome || meta.display_name || '';
+
+  return name && String(name).trim() ? String(name).trim() : u.email || '';
 }
