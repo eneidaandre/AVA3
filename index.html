@@ -69,7 +69,7 @@
       <p>Teste de conexão com o Supabase:</p>
       <div id="status">Carregando...</div>
 
-      <div class="row">
+      <div class="row" id="actions" style="display: none">
         <!-- IMPORTANTE: em Project Pages o link precisa ter /AVA3/ na URL,
              mas aqui usamos caminho relativo (./) que funciona corretamente -->
         <a class="btn" href="./login.html">Ir para Login</a>
@@ -83,45 +83,6 @@
     </div>
 
     <!-- IMPORTANTE: precisa ser type="module" -->
-    <script type="module">
-      import { supabaseHealthCheck } from './assets/js/supabaseClient.js';
-
-      const statusEl = document.getElementById('status');
-      const logsEl = document.getElementById('logs');
-
-      function log(msg) {
-        logsEl.style.display = 'block';
-        logsEl.textContent += msg + '\n';
-      }
-
-      async function main() {
-        try {
-          log('[BOOT] Iniciando health check do Supabase...');
-
-          const r = await supabaseHealthCheck();
-
-          if (!r.ok) {
-            statusEl.innerHTML = `❌ <span class="err">Erro no Supabase:</span> <code>${r.error}</code>`;
-            log('[ERR] ' + r.error);
-            return;
-          }
-
-          statusEl.innerHTML = `✅ <span class="ok">Conectado ao Supabase!</span> ${
-            r.hasSession
-              ? '<small>(sessão encontrada)</small>'
-              : '<small>(sem sessão — normal)</small>'
-          }`;
-
-          log('[OK] Conectado. hasSession=' + String(r.hasSession));
-        } catch (e) {
-          console.error(e);
-          const msg = e?.message || String(e);
-          statusEl.innerHTML = `❌ <span class="err">Erro inesperado:</span> <code>${msg}</code>`;
-          log('[ERR] ' + msg);
-        }
-      }
-
-      main();
-    </script>
+    <script type="module" src="./assets/js/entry.js"></script>
   </body>
 </html>
