@@ -1,44 +1,40 @@
-/* assets/css/login.css */
-
-h1 {
-  margin: 0 0 8px;
-}
-
 label {
-  display: block;
-  font-size: 14px;
-  margin: 12px 0 6px;
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
 }
 
 input {
-  width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--line);
   border-radius: 10px;
   outline: none;
 }
 
 input:focus {
-  border-color: #888;
-}
-
-button {
-  margin-top: 14px;
-  padding: 10px 14px;
-  border: 0;
-  border-radius: 10px;
-  cursor: pointer;
-  background: #111;
-  color: #fff;
-  font-weight: 600;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  border-color: #c9d6ff;
+  box-shadow: 0 0 0 3px rgba(26, 91, 214, 0.12);
 }
 
 .msg {
   margin-top: 12px;
-  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fafafa;
+  display: none;
+}
+
+.msg.ok {
+  display: block;
+  border-color: rgba(10, 122, 47, 0.25);
+  background: rgba(10, 122, 47, 0.06);
+  color: var(--ok);
+}
+
+.msg.err {
+  display: block;
+  border-color: rgba(176, 0, 32, 0.25);
+  background: rgba(176, 0, 32, 0.06);
+  color: var(--err);
 }

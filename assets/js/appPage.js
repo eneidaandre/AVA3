@@ -1,64 +1,49 @@
 // assets/js/appPage.js
 import { supabase } from './supabaseClient.js';
+import { goTo } from './router.js';
 
-const userLine = document.getElementById('userLine');
+const subtitle = document.getElementById('subtitle');
 const statusEl = document.getElementById('status');
-const btnLogout = document.getElementById('btnLogout');
+const btnLogout = document.getElementById('btn-logout');
 
-function goToLogin() {
-  // resolve certo no GitHub Pages mesmo com /AVA3/
-  const url = new URL('./login.html', window.location.href);
-  window.location.href = url.href;
+function setStatus(html) {
+  statusEl.innerHTML = html;
 }
 
-async function loadSessionOrRedirect() {
-  try {
-    const { data, error } = await supabase.auth.getSession();
+async function requireSession() {
+  const { data, error } = await supabase.auth.getSession();
 
-    if (error) {
-      console.error(error);
-      statusEl.innerHTML = `❌ Erro ao ler sessão: <code>${error.message}</code>`;
-      return;
-    }
-
-    const user = data?.session?.user;
-
-    if (!user) {
-      // sem sessão → volta pro login
-      goToLogin();
-      return;
-    }
-
-    // sessão ok
-    userLine.textContent = `Logado como: ${user.email}`;
-    statusEl.innerHTML =
-      `✅ Sessão ativa.<br>` +
-      `User ID: <code>${user.id}</code><br>` +
-      `Último login: <code>${new Date(
-        user.last_sign_in_at || Date.now()
-      ).toLocaleString()}</code>`;
-  } catch (e) {
-    console.error(e);
-    statusEl.innerHTML = `❌ Erro inesperado: <code>${e?.message || e}</code>`;
-  }
-}
-
-async function doLogout() {
-  btnLogout.disabled = true;
-  statusEl.textContent = 'Saindo...';
-
-  const { error } = await supabase.auth.signOut();
   if (error) {
-    console.error(error);
-    statusEl.innerHTML = `❌ Erro ao sair: <code>${error.message}</code>`;
-    btnLogout.disabled = false;
+    setStatus(`❌ Erro ao ler sessão: <code>${error.message}</code>`);
+    subtitle.textContent = 'Erro';
     return;
   }
 
-  goToLogin();
+  const session = data?.session;
+
+  if (!session) {
+    subtitle.textContent = 'Sem sessão';
+    setStatus('🔒 Você não está logado. Indo para o login...');
+    goTo('login.html');
+    return;
+  }
+
+  const email = session.user?.email || '(sem e-mail)';
+  subtitle.textContent = `Logado como ${email}`;
+  setStatus(`✅ Sessão ativa. Usuário: <code>${email}</code>`);
 }
 
-btnLogout.addEventListener('click', doLogout);
+btnLogout.addEventListener('click', async () => {
+  btnLogout.disabled = true;
+  btnLogout.textContent = 'Saindo...';
 
-// Protege a página
-loadSessionOrRedirect();
+  try {
+    await supabase.auth.signOut();
+    goTo('login.html');
+  } finally {
+    btnLogout.disabled = false;
+    btnLogout.textContent = 'Sair';
+  }
+});
+
+requireSession();

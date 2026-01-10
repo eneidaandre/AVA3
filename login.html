@@ -10,31 +10,45 @@
   </head>
 
   <body>
-    <div class="container">
-      <div class="card">
-        <h1>Entrar no AVA</h1>
-        <small>Login via Supabase Auth.</small>
+    <main class="wrap">
+      <section class="card">
+        <h1>Entrar</h1>
+        <p class="muted">Faça login para acessar o AVA.</p>
 
-        <label for="email">E-mail</label>
-        <input id="email" type="email" placeholder="seuemail@exemplo.com" />
+        <form id="form-login">
+          <label>
+            E-mail
+            <input id="email" type="email" autocomplete="email" required />
+          </label>
 
-        <label for="password">Senha</label>
-        <input id="password" type="password" placeholder="••••••••" />
+          <label>
+            Senha
+            <input
+              id="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
 
-        <button id="btnLogin">Entrar</button>
+          <button id="btn-login" type="submit">Entrar</button>
 
-        <div class="msg" id="msg"></div>
+          <div id="msg" class="msg" aria-live="polite"></div>
+        </form>
 
         <hr />
-        <small>
-          Se você já estiver logada, esta página redireciona automaticamente
-          para
-          <code>app.html</code>.
-        </small>
-      </div>
-    </div>
 
-    <!-- IMPORTANTE: module -->
+        <div class="row">
+          <a class="link" href="./index.html">Voltar</a>
+          <a class="link" href="./app.html">Ir para App</a>
+        </div>
+
+        <small class="muted"
+          >Se algo falhar, abra o Console (F12) para ver detalhes.</small
+        >
+      </section>
+    </main>
+
     <script type="module" src="./assets/js/login.js"></script>
   </body>
 </html>

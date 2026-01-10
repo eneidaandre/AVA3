@@ -10,27 +10,42 @@
   </head>
 
   <body>
-    <div class="container">
-      <div class="card header-card">
-        <div>
-          <h1>AVA • Área logada</h1>
-          <small id="userLine">Carregando usuário...</small>
+    <main class="wrap">
+      <section class="card">
+        <div class="top">
+          <div>
+            <h1>AVA • App</h1>
+            <p class="muted" id="subtitle">Carregando sua sessão...</p>
+          </div>
+
+          <div class="row">
+            <a class="link" href="./index.html">Home</a>
+            <button id="btn-logout" class="btn-ghost" type="button">
+              Sair
+            </button>
+          </div>
         </div>
 
-        <button id="btnLogout" class="btn-secondary">Sair</button>
-      </div>
+        <div class="box">
+          <h2>Status</h2>
+          <div id="status">Verificando autenticação...</div>
+        </div>
 
-      <div class="card">
-        <h2>Status</h2>
-        <div id="status">Validando sessão...</div>
+        <div class="box">
+          <h2>Próximos passos do projeto</h2>
+          <ul>
+            <li>Menu lateral (perfil, cursos, módulos, notas)</li>
+            <li>Listagem “Meus cursos” (courses + course_offers)</li>
+            <li>Página do curso (módulos e unidades)</li>
+          </ul>
+        </div>
 
-        <hr />
-        <small
-          >Se não aparecer nada, abra o Console (F12). Essa página só abre com
-          login.</small
+        <small class="muted"
+          >Esta página exige login. Se não tiver sessão, ela redireciona para o
+          login automaticamente.</small
         >
-      </div>
-    </div>
+      </section>
+    </main>
 
     <script type="module" src="./assets/js/appPage.js"></script>
   </body>

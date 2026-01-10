@@ -1,37 +1,20 @@
-/* assets/css/app.css */
-
-.header-card {
+.top {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
-h1 {
-  margin: 0 0 6px;
-}
-
-h2 {
-  margin: 0 0 10px;
-}
-
-.btn-secondary {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-secondary:hover {
-  background: #f3f3f3;
-}
-
-#status {
+.box {
+  margin-top: 14px;
   padding: 12px;
-  border: 1px dashed #ddd;
+  border: 1px solid var(--line);
   border-radius: 12px;
   background: #fcfcfc;
+}
+
+.box h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
 }
