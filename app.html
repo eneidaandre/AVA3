@@ -1,47 +1,54 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AVA • Meus cursos</title>
-
+    <title>AVA • Minha área</title>
     <link rel="stylesheet" href="./assets/css/site.css" />
-    <link rel="stylesheet" href="./assets/css/app.css" />
   </head>
 
-  <!-- data-auth="required" mantém seu fluxo: se não tiver sessão, redireciona -->
   <body data-page="app" data-auth="required">
-    <!-- HEADER (injetado pelo layout.js) -->
     <div id="site-header"></div>
 
-    <!-- SIDEBAR FIXA (injetada pelo layout.js quando existir) -->
+    <!-- HOST do menu lateral -->
     <div id="site-sidebar"></div>
+    <div id="sidebar-overlay"></div>
 
-    <main class="container">
-      <section class="card">
-        <div class="top">
-          <div>
-            <h1 style="margin: 0 0 6px">Meus cursos</h1>
-            <p style="margin: 0; opacity: 0.85">
-              Aqui você acompanha suas turmas e acessa os conteúdos disponíveis.
-            </p>
-          </div>
-
-          <div class="right">
-            <div class="badge" id="userBadge">Carregando...</div>
-
-            <!-- Atalho direto para o Admin (além do link no menu, quando você colocar no layout.js) -->
-            <a class="btn ghost" href="./admin.html" title="Ir para o painel Admin">
-              <i class="bx bx-cog"></i> Admin
-            </a>
-          </div>
-        </div>
-
-        <div class="box">
-          <h2>Suas turmas</h2>
-          <p style="margin: 0 0 10px; opacity: 0.85">
-            Assim que você estiver matriculado(a) em uma oferta/turma, ela aparecerá
-            aqui automaticamente.
+    <main class="page">
+      <div class="container">
+        <section class="card">
+          <h1 class="h1">Minha área</h1>
+          <p class="muted">
+            Aqui começam os módulos do AVA (cursos, ofertas, módulos, aulas...).
           </p>
 
-          <!-- Área o
+          <div class="hr"></div>
+
+          <div class="grid cols-2">
+            <div class="card">
+              <h2 class="h2">Usuário</h2>
+              <div class="badge" id="userBadge">Carregando.</div>
+            </div>
+
+            <div class="card">
+              <h2 class="h2">Próximos passos</h2>
+              <ul class="muted">
+                <li>Menu lateral (perfil, cursos, notas)</li>
+                <li>Meus cursos (courses + course_offers)</li>
+                <li>Página do curso (módulos e unidades)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <pre class="logs" id="logs" style="display: none"></pre>
+        </section>
+      </div>
+    </main>
+
+    <div id="site-footer"></div>
+
+    <script type="module" src="./assets/js/layout.js"></script>
+    <script type="module" src="./assets/js/app.js"></script>
+  </body>
+</html>

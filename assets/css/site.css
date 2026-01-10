@@ -16,6 +16,8 @@
   --footer-h: 56px;
 
   --container: 1100px;
+  --sidebar-w: 260px;
+
 }
 
 * {
@@ -712,5 +714,131 @@ body.sidebar-collapsed .side-item {
   }
   body.sidebar-open .sidebar-overlay {
     display: block;
+  }
+}
+/* ===========================
+   SIDEBAR (menu lateral fixo)
+   =========================== */
+
+:root {
+  --sidebar-w: 260px;
+}
+
+/* Quando existe sidebar, empurra o layout */
+body.has-sidebar {
+  padding-left: var(--sidebar-w);
+}
+
+/* Header e footer fixos respeitando sidebar (desktop) */
+body.has-sidebar .site-header,
+body.has-sidebar .site-footer {
+  left: var(--sidebar-w);
+}
+
+/* Sidebar fixa entre header e footer */
+.site-sidebar {
+  position: fixed;
+  left: 0;
+  top: var(--header-h);
+  bottom: var(--footer-h);
+  width: var(--sidebar-w);
+  z-index: 1200;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--line);
+
+  padding: 12px;
+  overflow: auto;
+}
+
+.side-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.side-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 12px 4px;
+}
+
+.side-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: none;
+}
+
+.side-item i {
+  font-size: 20px;
+  color: var(--brand);
+}
+
+.side-item:hover {
+  background: rgba(11, 87, 208, 0.06);
+  border-color: rgba(11, 87, 208, 0.14);
+}
+
+.side-item.active {
+  background: rgba(11, 87, 208, 0.1);
+  border-color: rgba(11, 87, 208, 0.2);
+}
+
+.side-label {
+  font-weight: 700;
+}
+
+/* Overlay (mobile) */
+.sidebar-overlay {
+  display: none;
+}
+
+/* MOBILE: sidebar vira gaveta */
+@media (max-width: 920px) {
+  body.has-sidebar {
+    padding-left: 0;
+  }
+
+  body.has-sidebar .site-header,
+  body.has-sidebar .site-footer {
+    left: 0;
+  }
+
+  .site-sidebar {
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+    width: min(var(--sidebar-w), 88vw);
+    top: 0;
+    bottom: 0;
+  }
+
+  body.sidebar-open .site-sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1190;
+    background: rgba(15, 23, 42, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
   }
 }

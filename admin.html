@@ -1,74 +1,31 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AVA • Admin</title>
-
     <link rel="stylesheet" href="./assets/css/site.css" />
-    <link rel="stylesheet" href="./assets/css/app.css" />
   </head>
 
   <body data-page="admin" data-auth="required">
     <div id="site-header"></div>
+
     <div id="site-sidebar"></div>
+    <div id="sidebar-overlay"></div>
 
-    <main class="container">
-      <section class="card">
-        <div class="top">
-          <div>
-            <h1 style="margin: 0 0 6px">Administração</h1>
-            <p style="margin: 0; opacity: 0.85">
-              Painel para cadastrar e gerenciar cursos, módulos e ofertas
-              (turmas).
-            </p>
-          </div>
-
-          <div class="right">
-            <div class="badge" id="adminBadge">Carregando...</div>
-            <a
-              class="btn ghost"
-              href="./app.html"
-              title="Voltar para Meus cursos"
-            >
-              <i class="bx bx-arrow-back"></i> Voltar
-            </a>
-          </div>
-        </div>
-
-        <div class="box">
-          <h2>Ações rápidas</h2>
-          <p style="margin: 0 0 10px; opacity: 0.85">
-            Nesta primeira versão, deixei o painel “pronto pra plugar” os
-            formulários e rotas. Depois a gente transforma cada card em cadastro
-            real (Cursos → Módulos → Ofertas).
+    <main class="page">
+      <div class="container">
+        <section class="card">
+          <h1 style="margin: 0">Admin</h1>
+          <p style="color: var(--muted); margin-top: 8px">
+            Página base do Admin (a gente evolui depois).
           </p>
-
-          <div class="grid">
-            <article class="card span-4">
-              <div class="kpi">
-                <i class="bx bx-book"></i>
-                <strong>Cursos</strong>
-              </div>
-              <p style="margin: 8px 0 0; opacity: 0.85">
-                Criar e editar o catálogo de cursos.
-              </p>
-            </article>
-
-            <article class="card span-4">
-              <div class="kpi">
-                <i class="bx bx-layer"></i>
-                <strong>Módulos</strong>
-              </div>
-              <p style="margin: 8px 0 0; opacity: 0.85">
-                Organizar módulos/unidades do curso.
-              </p>
-            </article>
-
-            <article class="card span-4"></article>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
+
+    <div id="site-footer"></div>
+
+    <script type="module" src="./assets/js/layout.js"></script>
   </body>
 </html>
