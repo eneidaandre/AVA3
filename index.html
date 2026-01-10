@@ -4,9 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AVA</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 24px;
+      }
+      .card {
+        max-width: 720px;
+        padding: 18px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+      }
+      code {
+        background: #f3f3f3;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      small {
+        color: #555;
+      }
+    </style>
   </head>
+
   <body>
-    <h1>AVA rodando ✅</h1>
-    <p>Primeiro commit feito pelo VS Code.</p>
+    <div class="card">
+      <h1>AVA rodando ✅</h1>
+      <p>Teste de conexão com o Supabase:</p>
+
+      <div id="status">Carregando...</div>
+
+      <hr />
+      <small>Se ficar em branco, abra o Console (F12) e veja o erro.</small>
+    </div>
+
+    <!-- IMPORTANTE: precisa ser type="module" -->
+    <script type="module" src="./assets/js/app.js"></script>
   </body>
 </html>
