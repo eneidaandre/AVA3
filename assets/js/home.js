@@ -1,32 +1,50 @@
 // assets/js/home.js
-import { getSessionSafe } from './supabaseClient.js';
+import { supabase } from './supabaseClient.js';
 
-const badge = document.getElementById('statusBadge');
-const logsEl = document.getElementById('logs');
-
-function log(msg) {
-  if (!logsEl) return;
-  logsEl.style.display = 'block';
-  logsEl.textContent += msg + '\n';
+function rel(path) {
+  return new URL(`./${path}`, window.location.href).toString();
 }
 
-async function main() {
-  log('[HOME] Iniciando...');
-  const { session, error } = await getSessionSafe();
+async function updateCTA() {
+  const cta = document.getElementById('cta-primary');
+  const cta2 = document.getElementById('cta-secondary');
+  const note = document.getElementById('home-note');
 
-  if (error) {
-    badge.textContent = '❌ Erro na sessão';
-    log('[ERR] ' + error);
-    return;
-  }
+  if (!cta) return;
 
-  if (session) {
-    badge.textContent = '✅ Logado(a)';
-    log('[OK] Sessão ativa');
+  const { data, error } = await supabase.auth.getSession();
+  if (error) return;
+
+  const hasSession = !!data?.session;
+  const email = data?.session?.user?.email || '';
+
+  if (hasSession) {
+    cta.textContent = 'Continuar no App';
+    cta.onclick = () => window.location.assign(rel('app.html'));
+
+    if (cta2) {
+      cta2.textContent = 'Gerenciar conta';
+      cta2.onclick = () => window.location.assign(rel('app.html'));
+    }
+
+    if (note)
+      note.textContent = email
+        ? `Sessão ativa: ${email}`
+        : 'Sessão ativa detectada.';
   } else {
-    badge.textContent = '✅ Público (sem login)';
-    log('[OK] Sem sessão (normal)');
+    cta.textContent = 'Entrar no AVA';
+    cta.onclick = () => window.location.assign(rel('login.html'));
+
+    if (cta2) {
+      cta2.textContent = 'Ver o App (prévia)';
+      cta2.onclick = () => window.location.assign(rel('app.html'));
+    }
+
+    if (note)
+      note.textContent =
+        'Você pode navegar aqui sem login. Para acessar cursos e recursos, faça login.';
   }
 }
 
-main();
+updateCTA();
+supabase.auth.onAuthStateChange(() => updateCTA());
