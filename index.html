@@ -9,13 +9,30 @@
       body {
         font-family: Arial, sans-serif;
         padding: 24px;
-        background: #fff;
       }
       .card {
-        max-width: 720px;
+        max-width: 820px;
         padding: 18px;
         border: 1px solid #ddd;
         border-radius: 12px;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      a.btn {
+        display: inline-block;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #111;
+        background: #fafafa;
+      }
+      a.btn:hover {
+        background: #f2f2f2;
       }
       code {
         background: #f3f3f3;
@@ -25,13 +42,21 @@
       small {
         color: #555;
       }
-      .debug {
-        margin-top: 12px;
-        font-size: 12px;
-        background: #fafafa;
-        border: 1px solid #eee;
+      .ok {
+        color: #0a7a2f;
+        font-weight: 600;
+      }
+      .err {
+        color: #b00020;
+        font-weight: 600;
+      }
+      pre {
+        margin-top: 10px;
+        background: #f7f7f7;
+        border: 1px solid #e6e6e6;
         border-radius: 10px;
-        padding: 10px;
+        padding: 12px;
+        overflow: auto;
         white-space: pre-wrap;
       }
     </style>
@@ -40,77 +65,63 @@
   <body>
     <div class="card">
       <h1>AVA rodando ✅</h1>
-      <p>Teste de conexão com o Supabase:</p>
 
+      <p>Teste de conexão com o Supabase:</p>
       <div id="status">Carregando...</div>
 
-      <div id="debug" class="debug">Logs:\n</div>
+      <div class="row">
+        <!-- IMPORTANTE: em Project Pages o link precisa ter /AVA3/ na URL,
+             mas aqui usamos caminho relativo (./) que funciona corretamente -->
+        <a class="btn" href="./login.html">Ir para Login</a>
+        <a class="btn" href="./app.html">Ir para App</a>
+      </div>
+
+      <pre id="logs" style="display: none"></pre>
 
       <hr />
       <small>Se der erro, ele aparece aqui e também no Console (F12).</small>
     </div>
 
+    <!-- IMPORTANTE: precisa ser type="module" -->
     <script type="module">
+      import { supabaseHealthCheck } from './assets/js/supabaseClient.js';
+
       const statusEl = document.getElementById('status');
-      const debugEl = document.getElementById('debug');
+      const logsEl = document.getElementById('logs');
 
       function log(msg) {
-        debugEl.textContent += msg + '\n';
-        console.log(msg);
+        logsEl.style.display = 'block';
+        logsEl.textContent += msg + '\n';
       }
 
-      function setStatus(html) {
-        statusEl.innerHTML = html;
-      }
+      async function main() {
+        try {
+          log('[BOOT] Iniciando health check do Supabase...');
 
-      // Sempre troca o "Carregando..." logo de cara:
-      const now = new Date().toLocaleString('pt-BR');
-      setStatus(`⏳ Inicializando... <small>(JS carregou em ${now})</small>`);
-      log(`[BOOT] JS carregou em ${now}`);
+          const r = await supabaseHealthCheck();
 
-      try {
-        log('[1/3] Importando supabaseClient.js ...');
+          if (!r.ok) {
+            statusEl.innerHTML = `❌ <span class="err">Erro no Supabase:</span> <code>${r.error}</code>`;
+            log('[ERR] ' + r.error);
+            return;
+          }
 
-        // IMPORT RELATIVO (funciona no GitHub Pages /AVA3/)
-        const mod = await import('./assets/js/supabaseClient.js');
+          statusEl.innerHTML = `✅ <span class="ok">Conectado ao Supabase!</span> ${
+            r.hasSession
+              ? '<small>(sessão encontrada)</small>'
+              : '<small>(sem sessão — normal)</small>'
+          }`;
 
-        log('[2/3] Import OK. Testando conexão com o Supabase...');
-
-        // Teste real (faz request)
-        const url = `${mod.supabaseUrl()}/auth/v1/health`;
-        log(`[PING] GET ${url}`);
-
-        const res = await fetch(url, {
-          method: 'GET',
-          headers: {
-            apikey: mod.supabaseAnonKey(),
-            Authorization: `Bearer ${mod.supabaseAnonKey()}`,
-          },
-        });
-
-        if (!res.ok) {
-          const txt = await res.text().catch(() => '');
-          setStatus(
-            `❌ Não conectou. HTTP <code>${res.status}</code> <br><small>${
-              txt || 'Sem corpo de resposta'
-            }</small>`
-          );
-          log(`[ERRO] HTTP ${res.status} - ${txt}`);
-        } else {
-          const data = await res.json().catch(() => ({}));
-          setStatus(
-            `✅ Conectado ao Supabase! <small>(health: ${JSON.stringify(
-              data
-            )})</small>`
-          );
-          log('[OK] Conectado ao Supabase.');
+          log('[OK] Conectado. hasSession=' + String(r.hasSession));
+        } catch (e) {
+          console.error(e);
+          const msg = e?.message || String(e);
+          statusEl.innerHTML = `❌ <span class="err">Erro inesperado:</span> <code>${msg}</code>`;
+          log('[ERR] ' + msg);
         }
-      } catch (e) {
-        setStatus(
-          `❌ Erro ao carregar/testar Supabase: <code>${e?.message || e}</code>`
-        );
-        log(`[EXCEPTION] ${e?.stack || e?.message || e}`);
       }
+
+      main();
     </script>
   </body>
 </html>
