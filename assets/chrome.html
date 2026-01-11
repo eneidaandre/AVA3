@@ -1,80 +1,144 @@
 <div data-slot="header">
-  <header class="site-header">
-    <div class="inner">
-      <div class="left">
-        <button id="sidebar-toggle" class="btn icon" title="Menu">
-          <i class="bx bx-menu"></i>
-        </button>
-        <a class="brand" href="./index.html"
-          ><span class="dot"></span><span>AVA3</span></a
-        >
-      </div>
+  <nav
+    class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top"
+    style="height: 60px"
+  >
+    <div class="container-fluid">
+      <button id="sidebar-toggle" class="btn btn-link me-3 text-dark">
+        <i class="bi bi-list fs-4"></i>
+      </button>
 
-      <nav class="nav-horizontal">
-        <a class="navlink" href="./index.html">Início</a>
-        <a class="navlink" href="./app.html">Meus Cursos</a>
+      <a
+        class="navbar-brand d-flex align-items-center gap-2"
+        href="dashboard.html"
+      >
+        <span class="bg-primary rounded-circle p-1 d-inline-block"></span>
+        <span class="fw-bold text-dark">AVA3</span>
+      </a>
+
+      <div class="ms-auto d-flex align-items-center gap-3">
         <a
-          class="navlink"
-          href="./admin.html"
           id="link-admin"
+          href="admin.html"
+          class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2"
           style="display: none"
-          >Admin</a
         >
-      </nav>
+          <i class="bi bi-shield-lock-fill"></i>
+          <span class="d-none d-md-inline">Painel Admin</span>
+        </a>
 
-      <div class="right">
-        <div id="user-pill" class="user-pill" style="display: none">
-          <div class="avatar-circle"><i class="bx bx-user"></i></div>
-          <span id="user-name">Aluno</span>
+        <div class="d-flex align-items-center gap-2 border-start ps-3">
+          <div class="text-end d-none d-sm-block" style="line-height: 1.2">
+            <small id="user-name" class="d-block fw-bold text-dark"
+              >Carregando...</small
+            >
+
+            <span
+              id="user-pill"
+              class="badge bg-primary-subtle text-primary"
+              style="font-size: 0.65rem"
+              >Aluno</span
+            >
+          </div>
+
+          <div
+            class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center text-secondary fw-bold"
+            style="width: 35px; height: 35px"
+          >
+            <i class="bi bi-person"></i>
+          </div>
         </div>
 
-        <div id="auth-actions">
-          <a href="./login.html" class="btn-sm primary">Entrar</a>
+        <div id="auth-actions" style="display: none">
+          <a href="login.html" class="btn btn-primary btn-sm">Entrar</a>
         </div>
       </div>
     </div>
-  </header>
+  </nav>
 </div>
 
 <div data-slot="sidebar">
-  <aside class="site-sidebar">
-    <div class="sidebar-inner">
-      <div class="side-group">
-        <p class="side-title">NAVEGAÇÃO</p>
-        <a class="side-item" href="./app.html">
-          <i class="bx bx-grid-alt"></i><span class="label-text">Painel</span>
-        </a>
-        <a class="side-item" href="#">
-          <i class="bx bx-calendar"></i
-          ><span class="label-text">Calendário</span>
-        </a>
-      </div>
-
-      <div class="side-group" id="sidebar-admin-group" style="display: none">
-        <p class="side-title">GESTÃO</p>
-        <a class="side-item" href="./admin.html">
-          <i class="bx bx-cog"></i><span class="label-text">Admin</span>
-        </a>
-      </div>
-
-      <div style="flex: 1"></div>
-
-      <div class="side-group">
-        <button
-          id="side-logout"
-          class="side-item danger"
-          style="display: none; color: #d32f2f"
+  <div
+    class="sidebar-content h-100 d-flex flex-column bg-white border-end pt-3"
+  >
+    <ul class="nav flex-column px-2 gap-1 flex-grow-1">
+      <li class="nav-item">
+        <a
+          href="dashboard.html"
+          class="nav-link d-flex align-items-center gap-3 text-dark rounded"
         >
-          <i class="bx bx-log-out"></i><span class="label-text">Sair</span>
-        </button>
+          <i class="bi bi-grid"></i>
+          <span>Meus Cursos</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          href="profile.html"
+          class="nav-link d-flex align-items-center gap-3 text-secondary rounded"
+        >
+          <i class="bi bi-person-gear"></i>
+          <span>Meu Perfil</span>
+        </a>
+      </li>
+
+      <div
+        id="sidebar-admin-group"
+        style="
+          display: none;
+          margin-top: 1rem;
+          border-top: 1px solid #eee;
+          padding-top: 1rem;
+        "
+      >
+        <small
+          class="text-uppercase text-muted fw-bold px-3"
+          style="font-size: 0.7rem"
+          >Gerência</small
+        >
+
+        <li class="nav-item mt-1">
+          <a
+            href="admin.html"
+            class="nav-link d-flex align-items-center gap-3 text-danger fw-bold rounded bg-danger-subtle"
+          >
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard Admin</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            href="admin-users.html"
+            class="nav-link d-flex align-items-center gap-3 text-secondary rounded"
+          >
+            <i class="bi bi-people"></i>
+            <span>Usuários</span>
+          </a>
+        </li>
       </div>
+    </ul>
+
+    <div class="p-3 border-top mt-auto">
+      <button
+        id="side-logout"
+        class="btn btn-light w-100 d-flex align-items-center justify-content-center gap-2 text-danger"
+      >
+        <i class="bi bi-box-arrow-left"></i>
+        <span>Sair</span>
+      </button>
     </div>
-  </aside>
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  </div>
+
+  <div id="sidebar-overlay" class="d-lg-none"></div>
 </div>
 
 <div data-slot="footer">
-  <footer class="site-footer">
-    <div class="inner">&copy; 2026 AVA3.</div>
+  <footer class="bg-white border-top py-3 mt-auto">
+    <div class="container text-center">
+      <small class="text-muted">
+        &copy; 2026 AVA3 Plataforma de Ensino. Todos os direitos reservados.
+      </small>
+    </div>
   </footer>
 </div>

@@ -1,7 +1,7 @@
 :root {
   --header-h: 64px;
   --sidebar-w: 260px;
-  --sidebar-collapsed-w: 70px; /* Largura fina */
+  --sidebar-collapsed-w: 70px; /* CORRIGIDO O NOME DA VARIÁVEL AQUI */
   --bg-color: #f8f9fa;
   --line: #e2e8f0;
   --brand: #0b57d0;
@@ -16,38 +16,37 @@ body {
   margin: 0;
   background-color: var(--bg-color);
   font-family: sans-serif;
-
-  /* Layout Fixo */
   padding-top: var(--header-h) !important;
   padding-left: var(--sidebar-w) !important;
   transition: padding-left 0.3s ease;
-
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
-/* === HEADER (TOPO) === */
+/* === HEADER === */
 .site-header {
-  position: fixed;
+  position: fixed !important;
   top: 0;
   left: 0;
   right: 0;
-  height: var(--header-h);
+  height: var(--header-h) !important;
   background: white;
   border-bottom: 1px solid var(--line);
   z-index: 2000;
   display: flex;
   align-items: center;
   padding: 0 20px;
+  width: 100% !important;
 }
 
 .site-header .inner {
   width: 100%;
   display: flex;
   align-items: center;
+  position: relative;
 }
-
 .left {
   display: flex;
   align-items: center;
@@ -99,10 +98,10 @@ body {
   font-weight: 600;
 }
 
-/* LADO DIREITO (LOGIN) - Empurra para a direita */
+/* DIREITA (LOGIN) */
 .right {
   margin-left: auto !important;
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 15px;
 }
@@ -112,11 +111,6 @@ body {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 30px;
-}
-.user-pill:hover {
-  background: #f0f0f0;
 }
 .avatar-circle {
   width: 32px;
@@ -144,18 +138,22 @@ body {
   font-weight: 600;
 }
 
-/* === SIDEBAR (LATERAL) === */
+/* === SIDEBAR === */
 .site-sidebar {
-  position: fixed;
-  top: var(--header-h);
-  left: 0;
-  bottom: 0;
-  width: var(--sidebar-w); /* Largura padrão */
+  position: fixed !important;
+  top: var(--header-h) !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: var(--sidebar-w) !important;
   background: white;
   border-right: 1px solid var(--line);
   z-index: 1000;
   overflow-x: hidden;
   transition: width 0.3s ease;
+  display: block !important;
+}
+body:not(.has-sidebar) .site-sidebar {
+  display: none !important;
 }
 
 .sidebar-inner {
@@ -198,23 +196,20 @@ body {
   white-space: nowrap;
 }
 
-/* === MODO RECOLHIDO (A MÁGICA ACONTECE AQUI) === */
+/* === MODO RECOLHIDO (Agora com a variável certa) === */
 body.sidebar-collapsed {
   padding-left: var(--sidebar-collapsed-w) !important;
 }
-
 body.sidebar-collapsed .site-sidebar {
   width: var(--sidebar-collapsed-w) !important;
 }
 
-/* Esconde textos */
 body.sidebar-collapsed .label-text,
 body.sidebar-collapsed .side-title {
   display: none !important;
   opacity: 0;
 }
 
-/* Centraliza ícones */
 body.sidebar-collapsed .side-item {
   justify-content: center !important;
   padding: 12px 0 !important;
@@ -230,9 +225,8 @@ body.sidebar-collapsed .side-item i {
     padding-left: 0 !important;
   }
   .nav-horizontal {
-    display: none;
+    display: none !important;
   }
-
   .site-sidebar {
     transform: translateX(-100%);
     width: var(--sidebar-w) !important;
@@ -240,7 +234,6 @@ body.sidebar-collapsed .side-item i {
   body.sidebar-open .site-sidebar {
     transform: translateX(0);
   }
-
   .sidebar-overlay {
     position: fixed;
     top: var(--header-h);
@@ -264,4 +257,5 @@ body.sidebar-collapsed .side-item i {
   text-align: center;
   font-size: 12px;
   color: #888;
+  width: 100%;
 }
