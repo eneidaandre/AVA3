@@ -1,0 +1,106 @@
+<!-- assets/partials/chrome.html -->
+<div data-slot="header">
+  <header class="site-header">
+    <div class="inner">
+      <div class="left">
+        <button
+          id="sidebar-toggle"
+          class="btn icon"
+          type="button"
+          aria-label="Abrir menu"
+        >
+          <i class="bx bx-menu"></i>
+        </button>
+
+        <a class="brand" href="./index.html">
+          <span class="dot"></span>
+          <span>AVA</span>
+        </a>
+      </div>
+
+      <!-- Menu HORIZONTAL (só navegação) -->
+      <nav class="nav" aria-label="Menu principal">
+        <a class="navlink" data-page="home" href="./index.html">Início</a>
+        <a class="navlink" data-page="app" href="./app.html">Meus cursos</a>
+        <a
+          class="navlink"
+          data-page="admin"
+          data-admin-only
+          href="./admin.html"
+          style="display: none"
+          >Admin</a
+        >
+      </nav>
+
+      <!-- Direita: usuário + Entrar/Sair -->
+      <div class="right">
+        <span id="user-pill" class="user-pill" style="display: none">
+          <i class="bx bx-user"></i>
+          <span class="user-pill-text">
+            <span id="user-name" class="user-name"></span>
+            <span id="user-email" class="user-email"></span>
+          </span>
+        </span>
+
+        <button id="auth-btn" class="btn primary" type="button">
+          <i class="bx bx-log-in"></i> Entrar
+        </button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<div data-slot="sidebar">
+  <aside class="site-sidebar" aria-label="Menu lateral">
+    <div class="side-group">
+      <a class="side-item" data-page="app" href="./app.html">
+        <i class="bx bx-grid-alt"></i>
+        <span class="side-label">Meus cursos</span>
+      </a>
+
+      <a
+        class="side-item"
+        data-page="admin"
+        data-admin-only
+        href="./admin.html"
+        style="display: none"
+      >
+        <i class="bx bx-cog"></i>
+        <span class="side-label">Admin</span>
+      </a>
+
+      <a class="side-item" data-page="home" href="./index.html">
+        <i class="bx bx-home-alt"></i>
+        <span class="side-label">Início</span>
+      </a>
+    </div>
+
+    <div class="side-divider"></div>
+
+    <div class="side-group">
+      <button
+        id="side-logout"
+        class="side-item danger"
+        type="button"
+        style="display: none"
+      >
+        <i class="bx bx-log-out"></i>
+        <span class="side-label">Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+</div>
+
+<div data-slot="footer">
+  <footer class="site-footer">
+    <div class="inner">
+      <div>© <span id="year"></span> AVA</div>
+      <div class="footer-links">
+        <a href="./index.html">Home</a>
+        <a href="./app.html">Meus cursos</a>
+      </div>
+    </div>
+  </footer>
+</div>

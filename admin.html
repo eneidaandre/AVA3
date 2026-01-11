@@ -3,277 +3,88 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AVA • Administração</title>
+    <title>AVA • Admin</title>
 
-    <!-- CSS base do site -->
     <link rel="stylesheet" href="./assets/css/site.css" />
-    <!-- CSS exclusivo do Admin -->
-    <link rel="stylesheet" href="./assets/css/admin.css" />
+    <link rel="stylesheet" href="./assets/css/chrome.css" />
   </head>
 
-  <body data-page="admin" data-auth="required">
-    <!-- HEADER (injetado pelo layout.js) -->
+  <body data-page="admin" data-auth="required" data-admin="required">
+    <!-- CHROME -->
     <div id="site-header"></div>
-
-    <!-- (Opcional / pronto para quando seu layout.js também injetar sidebar) -->
     <div id="site-sidebar"></div>
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <main class="page">
       <div class="container">
-        <section class="card">
-          <!-- Topo da página Admin -->
-          <section class="admin-top">
-            <div>
-              <h1 class="admin-title">Área Administrativa</h1>
-              <p class="admin-subtitle">
-                Acesso restrito para gerenciamento do AVA.
-              </p>
-            </div>
-
-            <div class="admin-badges">
-              <span class="badge" id="adminStatus">Verificando acesso…</span>
-            </div>
-          </section>
-
-          <!-- Mensagens (erros/sucesso) -->
-          <div id="adminMsg" class="admin-msg" hidden></div>
-
-          <!-- Cards principais -->
-          <div class="admin-grid" id="adminCards" hidden>
-            <!-- CARD: CURSOS -->
-            <article class="admin-card">
-              <div class="admin-ico"><i class="bx bx-book-open"></i></div>
-              <div class="admin-body">
-                <h2>Cursos</h2>
-                <p>Inclua e mantenha o catálogo de cursos do AVA.</p>
-
-                <div class="admin-kpis">
-                  <span class="chip"
-                    >Total: <strong id="kpiCourses">—</strong></span
-                  >
-                </div>
-
-                <div class="admin-actions">
-                  <button
-                    class="btn primary"
-                    type="button"
-                    data-admin-open="courses"
-                  >
-                    Gerenciar
-                  </button>
-                  <button
-                    class="btn"
-                    type="button"
-                    data-admin-open="courses-new"
-                  >
-                    Novo curso
-                  </button>
-                </div>
-              </div>
-            </article>
-
-            <!-- CARD: USUÁRIOS -->
-            <article class="admin-card">
-              <div class="admin-ico"><i class="bx bx-user"></i></div>
-              <div class="admin-body">
-                <h2>Usuários</h2>
-                <p>Gerencie perfis e permissões (role: admin / aluno).</p>
-
-                <div class="admin-kpis">
-                  <span class="chip"
-                    >Total: <strong id="kpiUsers">—</strong></span
-                  >
-                </div>
-
-                <div class="admin-actions">
-                  <button
-                    class="btn primary"
-                    type="button"
-                    data-admin-open="users"
-                  >
-                    Gerenciar
-                  </button>
-                </div>
-              </div>
-            </article>
-
-            <!-- CARD: TURMAS -->
-            <article class="admin-card">
-              <div class="admin-ico"><i class="bx bx-calendar"></i></div>
-              <div class="admin-body">
-                <h2>Turmas</h2>
-                <p>Gerencie turmas/ofertas (course_offers) do AVA.</p>
-
-                <div class="admin-kpis">
-                  <span class="chip"
-                    >Total: <strong id="kpiOffers">—</strong></span
-                  >
-                </div>
-
-                <div class="admin-actions">
-                  <button
-                    class="btn primary"
-                    type="button"
-                    data-admin-open="offers"
-                  >
-                    Gerenciar
-                  </button>
-                </div>
-              </div>
-            </article>
+        <section class="hero">
+          <div class="badge">
+            <i class="bx bx-cog"></i>
+            Painel Administrativo
           </div>
 
-          <!-- Painéis (conteúdo detalhado) -->
-          <section class="admin-panels" id="adminPanels" hidden>
-            <!-- CURSOS: LISTA -->
-            <section class="admin-panel" id="panel-courses" hidden>
-              <div class="panel-head">
-                <div>
-                  <h3>Cursos</h3>
-                  <p>Lista de cursos cadastrados.</p>
-                </div>
-                <div class="panel-actions">
-                  <button
-                    class="btn"
-                    type="button"
-                    data-admin-open="courses-new"
-                  >
-                    Novo curso
-                  </button>
-                  <button class="btn" type="button" id="btnReloadCourses">
-                    Atualizar
-                  </button>
-                </div>
-              </div>
+          <h1 style="margin-top: 12px">Administração do AVA</h1>
+          <p>Acesso restrito. Aqui você gerencia cursos, turmas e usuários.</p>
+        </section>
 
-              <div class="table-wrap">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Título</th>
-                      <th>Descrição</th>
-                      <th style="width: 160px">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="coursesTbody"></tbody>
-                </table>
-              </div>
-            </section>
-
-            <!-- CURSOS: NOVO -->
-            <section class="admin-panel" id="panel-courses-new" hidden>
-              <div class="panel-head">
-                <div>
-                  <h3>Novo curso</h3>
-                  <p>
-                    Crie um curso no catálogo (tabela <code>courses</code>).
-                  </p>
-                </div>
-                <div class="panel-actions">
-                  <button class="btn" type="button" data-admin-open="courses">
-                    Voltar
-                  </button>
-                </div>
-              </div>
-
-              <form class="form" id="courseForm">
-                <div class="field full">
-                  <label for="c_title">Título *</label>
-                  <input id="c_title" name="title" required />
-                </div>
-
-                <div class="field full">
-                  <label for="c_desc">Descrição</label>
-                  <textarea id="c_desc" name="description"></textarea>
-                </div>
-
-                <div class="field">
-                  <button class="btn primary" type="submit">Salvar</button>
-                </div>
-              </form>
-            </section>
-
-            <!-- USUÁRIOS -->
-            <section class="admin-panel" id="panel-users" hidden>
-              <div class="panel-head">
-                <div>
-                  <h3>Usuários</h3>
-                  <p>Lista de perfis e ajuste de role.</p>
-                </div>
-                <div class="panel-actions">
-                  <input
-                    id="userSearch"
-                    class="input"
-                    placeholder="Buscar nome/email…"
-                  />
-                  <button class="btn" type="button" id="btnReloadUsers">
-                    Atualizar
-                  </button>
-                </div>
-              </div>
-
-              <div class="table-wrap">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>E-mail</th>
-                      <th>Role</th>
-                      <th style="width: 140px">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="usersTbody"></tbody>
-                </table>
-              </div>
-            </section>
-
-            <!-- TURMAS -->
-            <section class="admin-panel" id="panel-offers" hidden>
-              <div class="panel-head">
-                <div>
-                  <h3>Turmas</h3>
-                  <p>Listagem básica (course_offers ou view).</p>
-                </div>
-                <div class="panel-actions">
-                  <button class="btn" type="button" id="btnReloadOffers">
-                    Atualizar
-                  </button>
-                </div>
-              </div>
-
-              <div class="table-wrap">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Curso</th>
-                      <th>Status</th>
-                      <th>Início</th>
-                      <th>Fim</th>
-                    </tr>
-                  </thead>
-                  <tbody id="offersTbody"></tbody>
-                </table>
-              </div>
-            </section>
-          </section>
-
-          <noscript>
-            <div class="admin-msg err" style="margin-top: 12px">
-              Este painel precisa de JavaScript habilitado para funcionar.
+        <section class="grid" style="margin-top: 18px">
+          <article class="card span-4">
+            <h3>📚 Cursos</h3>
+            <p class="muted">
+              Cadastrar cursos, editar informações e organizar conteúdo.
+            </p>
+            <div style="margin-top: 12px">
+              <button class="btn" id="btn-admin-cursos">
+                Gerenciar cursos
+              </button>
             </div>
-          </noscript>
+          </article>
+
+          <article class="card span-4">
+            <h3>👥 Usuários</h3>
+            <p class="muted">
+              Visualizar perfis, definir permissões e identificar admins.
+            </p>
+            <div style="margin-top: 12px">
+              <button class="btn" id="btn-admin-usuarios">
+                Gerenciar usuários
+              </button>
+            </div>
+          </article>
+
+          <article class="card span-4">
+            <h3>🏷️ Turmas</h3>
+            <p class="muted">
+              Criar turmas/ofertas, definir datas e acompanhar matrículas.
+            </p>
+            <div style="margin-top: 12px">
+              <button class="btn" id="btn-admin-turmas">
+                Gerenciar turmas
+              </button>
+            </div>
+          </article>
+        </section>
+
+        <section class="card" style="margin-top: 14px">
+          <h3 style="margin: 0 0 8px">Área de trabalho</h3>
+          <p class="muted" style="margin: 0">
+            Aqui você pode renderizar formulários e tabelas do admin via JS.
+          </p>
+
+          <div class="hr"></div>
+
+          <div id="admin-root">
+            <div class="muted">Selecione uma opção acima.</div>
+          </div>
         </section>
       </div>
     </main>
 
-    <!-- FOOTER (injetado pelo layout.js) -->
     <div id="site-footer"></div>
 
-    <!-- JS base de layout (header/footer + auth UI) -->
-    <script type="module" src="./assets/js/layout.js"></script>
-    <!-- JS exclusivo do Admin (valida admin e carrega dados) -->
+    <!-- CHROME -->
+    <script type="module" src="./assets/js/chrome.js"></script>
+
+    <!-- Admin (se já existir) -->
     <script type="module" src="./assets/js/admin.js"></script>
   </body>
 </html>
