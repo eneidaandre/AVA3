@@ -9,155 +9,56 @@
     <link rel="stylesheet" href="./assets/css/admin.css" />
   </head>
 
-  <body data-page="admin" data-auth="admin">
+  <body data-page="admin" data-auth="required">
     <div id="site-header"></div>
     <div id="site-sidebar"></div>
 
     <main class="page">
       <div class="container">
-        <section class="card admin-hero">
-          <div class="admin-hero-top">
-            <div>
-              <h1 class="h1">Área Administrativa</h1>
-              <p class="muted">Acesso restrito</p>
-            </div>
+        <section class="card">
+          <h1 class="h1">Área Administrativa</h1>
+          <p class="muted">Acesso restrito</p>
 
-            <div class="admin-status">
-              <span class="pill" id="admin-pill">
-                <span class="dot-live"></span>
-                <span id="admin-pill-text">Verificando acesso…</span>
-              </span>
-            </div>
-          </div>
-
-          <div class="admin-hero-box" id="admin-guard-box">
-            <div class="spinner" aria-hidden="true"></div>
+          <div class="admin-status" id="adminStatus">
+            <div class="spinner"></div>
             <div>
-              <div class="admin-guard-title">Verificando acesso…</div>
-              <div class="muted" id="admin-guard-msg">
+              <div class="admin-title">Verificando acesso...</div>
+              <div class="muted">
                 Você será redirecionado(a) se não tiver permissão.
               </div>
-              <div
-                class="admin-guard-hint muted"
-                id="admin-guard-hint"
-                style="display: none"
-              ></div>
             </div>
           </div>
-        </section>
 
-        <section class="admin-grid" id="admin-content" style="display: none">
-          <section class="card">
-            <div class="card-head">
-              <h2 class="h2">Visão geral</h2>
-              <p class="muted">Totais rápidos (usuários, cursos, ofertas).</p>
-            </div>
+          <div id="adminContent" style="display: none">
+            <div class="hr"></div>
 
-            <div class="grid cols-3">
-              <div class="stat">
-                <div class="stat-label muted">Usuários</div>
-                <div class="stat-value" id="stat-users">—</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label muted">Cursos</div>
-                <div class="stat-value" id="stat-courses">—</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label muted">Ofertas</div>
-                <div class="stat-value" id="stat-offers">—</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2 class="h2">Usuários</h2>
-              <p class="muted">Gerencie papéis (aluno/admin).</p>
-            </div>
-
-            <div class="table-wrap">
-              <table class="table" id="users-table">
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th style="width: 160px">Papel</th>
-                    <th style="width: 140px">Ação</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-
-            <div class="muted" id="users-empty" style="display: none">
-              Nenhum usuário encontrado.
-            </div>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2 class="h2">Cursos</h2>
-              <p class="muted">Cadastrar e listar cursos (catálogo).</p>
-            </div>
-
-            <form class="form" id="course-form">
-              <div class="form-row">
-                <label class="field">
-                  <span class="label">Título <span class="req">*</span></span>
-                  <input class="input" id="course-title" required />
-                </label>
-
-                <label class="field">
-                  <span class="label">Tipo (opcional)</span>
-                  <input
-                    class="input"
-                    id="course-type"
-                    placeholder="ex.: técnico, qualificação..."
-                  />
-                </label>
+            <div class="grid cols-2">
+              <div class="card">
+                <h2 class="h2">Seu perfil</h2>
+                <div class="badge" id="adminUserBadge">Carregando...</div>
               </div>
 
-              <label class="field">
-                <span class="label">Descrição (opcional)</span>
-                <textarea class="input" id="course-desc" rows="3"></textarea>
-              </label>
-
-              <div class="form-actions">
-                <button class="btn primary" type="submit" id="course-save">
-                  <i class="bx bx-save"></i> Salvar curso
-                </button>
-                <span class="muted" id="course-msg"></span>
+              <div class="card">
+                <h2 class="h2">Ações rápidas</h2>
+                <ul class="muted">
+                  <li>Cadastro de cursos</li>
+                  <li>Cadastro de módulos</li>
+                  <li>Cadastro de ofertas/turmas</li>
+                </ul>
               </div>
-            </form>
+            </div>
 
             <div class="hr"></div>
 
-            <div class="table-wrap">
-              <table class="table" id="courses-table">
-                <thead>
-                  <tr>
-                    <th>Título</th>
-                    <th>Tipo</th>
-                    <th>Descrição</th>
-                    <th style="width: 140px">Ação</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
+            <div class="card">
+              <h2 class="h2">Painel (placeholder)</h2>
+              <p class="muted">
+                Aqui entraremos com as telas de CRUD. Por enquanto, esta página
+                só valida permissão e garante que o link Admin não apareça para
+                quem não é admin.
+              </p>
             </div>
-
-            <div class="muted" id="courses-empty" style="display: none">
-              Nenhum curso encontrado.
-            </div>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2 class="h2">Logs</h2>
-              <p class="muted">Se algo falhar, o erro aparece aqui.</p>
-            </div>
-            <pre class="logs" id="admin-logs" style="display: block"></pre>
-          </section>
+          </div>
         </section>
       </div>
     </main>

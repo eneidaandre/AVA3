@@ -661,3 +661,153 @@ body.sidebar-collapsed .side-item {
     transform: translateX(0);
   }
 }
+/* =========================================================
+   SIDEBAR (injetado por layout.js)
+   ========================================================= */
+
+.has-sidebar .page {
+  padding-left: 280px;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: var(--header-h);
+  bottom: 0;
+  width: 280px;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.sidebar-top {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sidebar-title {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.sidebar-nav {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidelink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.sidelink i {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.sidelink:hover {
+  background: rgba(11, 87, 208, 0.06);
+  border-color: rgba(11, 87, 208, 0.12);
+}
+
+.sidelink.active {
+  background: rgba(11, 87, 208, 0.1);
+  border-color: rgba(11, 87, 208, 0.18);
+}
+
+.sidebar-sep {
+  height: 1px;
+  background: var(--line);
+  margin: 10px 10px 8px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.w-100 {
+  width: 100%;
+}
+
+/* Recolhido (desktop) */
+.sidebar-collapsed .sidebar {
+  width: 84px;
+}
+
+.sidebar-collapsed .has-sidebar .page,
+.has-sidebar.sidebar-collapsed .page {
+  padding-left: 84px;
+}
+
+.sidebar-collapsed .sidelink span {
+  display: none;
+}
+
+.sidebar-collapsed .sidebar-title {
+  display: none;
+}
+
+.sidebar-collapsed .sidebar-top {
+  justify-content: flex-end;
+}
+
+/* Botão hambúrguer só quando tem sidebar e no mobile */
+#sidebar-toggle {
+  display: none;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+/* Mobile */
+@media (max-width: 920px) {
+  .has-sidebar .page {
+    padding-left: 0;
+  }
+
+  #sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .sidebar {
+    transform: translateX(-110%);
+    transition: transform 0.18s ease;
+    top: 0;
+    width: 280px;
+  }
+
+  .sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    display: none;
+    z-index: 19;
+  }
+
+  .sidebar-open .sidebar-backdrop {
+    display: block;
+  }
+}
