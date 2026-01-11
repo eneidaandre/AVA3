@@ -10,7 +10,7 @@ async function initChrome() {
 
   try {
     const res = await fetch(LAYOUT_URL);
-    if (!res.ok) throw new Error('Menu error');
+    if (!res.ok) throw new Error('Erro ao carregar menu');
     const text = await res.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(text, 'text/html');
@@ -19,20 +19,19 @@ async function initChrome() {
     inject('site-sidebar', doc, 'sidebar');
     inject('site-footer', doc, 'footer');
 
-    // Restaura estado do menu (fechado/aberto)
-    restoreState();
+    // Restaura o estado da barra (fechada/aberta)
+    restoreSidebarState();
 
-    // Inicia verificação de permissões
-    checkAuth();
+    // Inicia verificação de dados
+    checkAuthAndProfile();
   } catch (err) {
     console.error(err);
   }
 }
 
-// === VERIFICAÇÃO DE LOGIN E PERMISSÃO (ADMIN) ===
-async function checkAuth() {
+// === LÓGICA DO PERFIL E NOME (AQUI ESTÁ A CORREÇÃO) ===
+async function checkAuthAndProfile() {
   try {
-    // 1. Pega a sessão atual
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -42,16 +41,19 @@ async function checkAuth() {
     const nameEl = document.getElementById('user-name');
     const logoutBtn = document.getElementById('side-logout');
 
-    // Links que devem ser protegidos
     const adminLink = document.getElementById('link-admin');
     const adminGroup = document.getElementById('sidebar-admin-group');
 
-    if (session) {
-      // --- USUÁRIO LOGADO ---
+    // Reseta visual (esconde tudo por segurança)
+    if (pill) pill.style.display = 'none';
+    if (actions) actions.style.display = 'block'; // Mostra botão entrar por padrão
+    if (adminLink) adminLink.style.display = 'none';
+    if (adminGroup) adminGroup.style.display = 'none';
 
-      // A. Ajusta visual (Esconde botão entrar, mostra perfil)
-      if (pill) pill.style.display = 'flex';
+    if (session) {
+      // 1. Oculta botão entrar e mostra pílula do usuário
       if (actions) actions.style.display = 'none';
+      if (pill) pill.style.display = 'flex';
       if (logoutBtn) {
         logoutBtn.style.display = 'flex';
         logoutBtn.onclick = async () => {
@@ -60,42 +62,40 @@ async function checkAuth() {
         };
       }
 
-      // B. Define o Nome (Metadados ou Email)
-      const meta = session.user.user_metadata || {};
-      // Tenta 'full_name', 'name', ou parte do email
-      const displayName =
-        meta.full_name || meta.name || session.user.email.split('@')[0];
-      if (nameEl) nameEl.textContent = displayName;
-
-      // C. VERIFICA SE É ADMIN (Consulta no Banco)
-      const { data: profile } = await supabase
+      // 2. BUSCAR DADOS NA TABELA 'PROFILES' (Conforme sua imagem)
+      // O nome está na coluna 'name' e o cargo em 'role'
+      const { data: profile, error } = await supabase
         .from('profiles')
-        .select('role')
+        .select('*')
         .eq('id', session.user.id)
         .single();
 
-      // Se o role for 'admin', mostra os links
+      // Define o nome a ser exibido
+      let displayName = 'Aluno';
+
+      if (profile && profile.name) {
+        displayName = profile.name; // Pega da tabela profiles
+      } else if (session.user.user_metadata?.full_name) {
+        displayName = session.user.user_metadata.full_name; // Fallback
+      } else {
+        displayName = session.user.email.split('@')[0]; // Último recurso
+      }
+
+      // Atualiza o HTML
+      if (nameEl) nameEl.textContent = displayName;
+
+      // 3. Verifica Admin
       if (profile && profile.role === 'admin') {
         if (adminLink) adminLink.style.display = 'block';
         if (adminGroup) adminGroup.style.display = 'block';
-      } else {
-        // Garante que fiquem ocultos se não for admin
-        if (adminLink) adminLink.style.display = 'none';
-        if (adminGroup) adminGroup.style.display = 'none';
       }
-    } else {
-      // --- VISITANTE ---
-      if (pill) pill.style.display = 'none';
-      if (actions) actions.style.display = 'block'; // Botão Entrar visível
-      if (adminLink) adminLink.style.display = 'none';
-      if (adminGroup) adminGroup.style.display = 'none';
     }
   } catch (e) {
-    console.warn('Erro ao verificar auth:', e);
+    console.warn('Erro ao carregar perfil:', e);
   }
 }
 
-// === LÓGICA DE ABRIR/FECHAR MENU ===
+// === LÓGICA DE CLIQUE (ABRIR/FECHAR) ===
 document.addEventListener('click', (e) => {
   if (
     e.target.closest('#sidebar-toggle') ||
@@ -107,16 +107,17 @@ document.addEventListener('click', (e) => {
     if (isMobile) {
       body.classList.toggle('sidebar-open');
     } else {
+      // Desktop: Alterna classe collapsed
       body.classList.toggle('sidebar-collapsed');
-      localStorage.setItem(
-        'sidebar_collapsed',
-        body.classList.contains('sidebar-collapsed')
-      );
+
+      // Salva preferência
+      const collapsed = body.classList.contains('sidebar-collapsed');
+      localStorage.setItem('sidebar_collapsed', collapsed);
     }
   }
 });
 
-function restoreState() {
+function restoreSidebarState() {
   if (window.innerWidth > 900) {
     const collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     document.body.classList.add('has-sidebar');
