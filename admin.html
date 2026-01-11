@@ -1,93 +1,170 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Área Administrativa</title>
+    <title>AVA • Administração</title>
 
+    <link rel="stylesheet" href="./assets/css/site.css" />
     <link rel="stylesheet" href="./assets/css/admin.css" />
   </head>
 
-  <body>
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo">AVA</div>
-        <div class="brand-text">
-          <div class="brand-title">Área Administrativa</div>
-          <div class="brand-subtitle">Acesso restrito</div>
-        </div>
-      </div>
+  <body data-page="admin" data-auth="admin">
+    <div id="site-header"></div>
+    <div id="site-sidebar"></div>
 
-      <div class="topbar-actions">
-        <div class="user-chip" id="userChip" hidden>
-          <span class="dot"></span>
-          <span id="userName">Carregando...</span>
-        </div>
-        <button class="btn btn-ghost" id="btnLogout" hidden>Sair</button>
-      </div>
-    </header>
-
-    <main class="container">
-      <!-- Loader / status -->
-      <section class="status-card" id="statusCard">
-        <div class="spinner" aria-hidden="true"></div>
-        <div class="status-text">
-          <h1>Verificando acesso…</h1>
-          <p>Você será redirecionado(a) se não tiver permissão.</p>
-        </div>
-      </section>
-
-      <!-- Conteúdo (só aparece se for admin) -->
-      <section class="content" id="adminContent" hidden>
-        <div class="grid">
-          <article class="card">
-            <h2>Painel</h2>
-            <p>
-              Coloque aqui o conteúdo da sua página administrativa (dashboard,
-              cadastros, etc.).
-            </p>
-            <div class="hint">
-              Dica: tudo que estava dentro do <code>&lt;body&gt;</code> do seu
-              HTML antigo pode entrar aqui.
+    <main class="page">
+      <div class="container">
+        <section class="card admin-hero">
+          <div class="admin-hero-top">
+            <div>
+              <h1 class="h1">Área Administrativa</h1>
+              <p class="muted">Acesso restrito</p>
             </div>
-          </article>
 
-          <article class="card">
-            <h2>Ações rápidas</h2>
-            <ul class="list">
-              <li>Gerenciar cursos</li>
-              <li>Gerenciar turmas/ofertas</li>
-              <li>Gerenciar módulos/aulas</li>
-              <li>Ver matrículas</li>
-            </ul>
-            <div class="hint">
-              (Esses itens são exemplos — substitua pelos seus.)
+            <div class="admin-status">
+              <span class="pill" id="admin-pill">
+                <span class="dot-live"></span>
+                <span id="admin-pill-text">Verificando acesso…</span>
+              </span>
             </div>
-          </article>
-        </div>
-
-        <article class="card full">
-          <h2>Área principal</h2>
-          <p>
-            Se você já tem um dashboard pronto, é aqui que você cola o HTML dele
-            e, no JS, você cola a lógica de carregar dados.
-          </p>
-
-          <div class="placeholder">
-            <strong>Seu conteúdo entra aqui</strong>
-            <span>Ex.: tabela, filtros, gráficos, cards…</span>
           </div>
-        </article>
-      </section>
+
+          <div class="admin-hero-box" id="admin-guard-box">
+            <div class="spinner" aria-hidden="true"></div>
+            <div>
+              <div class="admin-guard-title">Verificando acesso…</div>
+              <div class="muted" id="admin-guard-msg">
+                Você será redirecionado(a) se não tiver permissão.
+              </div>
+              <div
+                class="admin-guard-hint muted"
+                id="admin-guard-hint"
+                style="display: none"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-grid" id="admin-content" style="display: none">
+          <section class="card">
+            <div class="card-head">
+              <h2 class="h2">Visão geral</h2>
+              <p class="muted">Totais rápidos (usuários, cursos, ofertas).</p>
+            </div>
+
+            <div class="grid cols-3">
+              <div class="stat">
+                <div class="stat-label muted">Usuários</div>
+                <div class="stat-value" id="stat-users">—</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label muted">Cursos</div>
+                <div class="stat-value" id="stat-courses">—</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label muted">Ofertas</div>
+                <div class="stat-value" id="stat-offers">—</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h2 class="h2">Usuários</h2>
+              <p class="muted">Gerencie papéis (aluno/admin).</p>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table" id="users-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th style="width: 160px">Papel</th>
+                    <th style="width: 140px">Ação</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="muted" id="users-empty" style="display: none">
+              Nenhum usuário encontrado.
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h2 class="h2">Cursos</h2>
+              <p class="muted">Cadastrar e listar cursos (catálogo).</p>
+            </div>
+
+            <form class="form" id="course-form">
+              <div class="form-row">
+                <label class="field">
+                  <span class="label">Título <span class="req">*</span></span>
+                  <input class="input" id="course-title" required />
+                </label>
+
+                <label class="field">
+                  <span class="label">Tipo (opcional)</span>
+                  <input
+                    class="input"
+                    id="course-type"
+                    placeholder="ex.: técnico, qualificação..."
+                  />
+                </label>
+              </div>
+
+              <label class="field">
+                <span class="label">Descrição (opcional)</span>
+                <textarea class="input" id="course-desc" rows="3"></textarea>
+              </label>
+
+              <div class="form-actions">
+                <button class="btn primary" type="submit" id="course-save">
+                  <i class="bx bx-save"></i> Salvar curso
+                </button>
+                <span class="muted" id="course-msg"></span>
+              </div>
+            </form>
+
+            <div class="hr"></div>
+
+            <div class="table-wrap">
+              <table class="table" id="courses-table">
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th style="width: 140px">Ação</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="muted" id="courses-empty" style="display: none">
+              Nenhum curso encontrado.
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h2 class="h2">Logs</h2>
+              <p class="muted">Se algo falhar, o erro aparece aqui.</p>
+            </div>
+            <pre class="logs" id="admin-logs" style="display: block"></pre>
+          </section>
+        </section>
+      </div>
     </main>
 
-    <footer class="footer">
-      <span>AVA • Administração</span>
-      <span class="muted"
-        >Protegido por autenticação + verificação de papel</span
-      >
-    </footer>
+    <div id="site-footer"></div>
 
+    <script type="module" src="./assets/js/layout.js"></script>
     <script type="module" src="./assets/js/admin.js"></script>
   </body>
 </html>

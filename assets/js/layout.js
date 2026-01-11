@@ -1,11 +1,8 @@
 // assets/js/layout.js
-// Layout global (header + footer + sidebar) "blindado":
-// - NÃO depende do Supabase para renderizar
-// - tenta carregar Supabase depois (dynamic import) só para sessão/logout/proteção
+import { supabase } from './supabaseClient.js';
 
 function ensureBoxicons() {
   if (document.querySelector('link[data-boxicons="1"]')) return;
-
   const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = 'https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css';
@@ -21,10 +18,6 @@ function getActivePage() {
   return document.body.dataset.page || '';
 }
 
-function hasSidebarHost() {
-  return !!document.getElementById('site-sidebar');
-}
-
 function renderHeaderFooter() {
   ensureBoxicons();
 
@@ -32,20 +25,14 @@ function renderHeaderFooter() {
   const headerHost = document.getElementById('site-header');
   const footerHost = document.getElementById('site-footer');
 
-  const showToggle = hasSidebarHost();
-
   if (headerHost) {
     headerHost.innerHTML = `
       <header class="site-header">
         <div class="inner">
-          <div class="left" style="display:flex; align-items:center; gap:10px;">
-            ${
-              showToggle
-                ? `<button class="btn ghost" id="sidebar-toggle" title="Menu" aria-label="Abrir menu">
-                     <i class="bx bx-menu"></i>
-                   </button>`
-                : ``
-            }
+          <div class="brand-row">
+            <button class="icon-btn" id="sidebar-toggle" type="button" aria-label="Menu">
+              <i class="bx bx-menu"></i>
+            </button>
 
             <a class="brand" href="${rel('index.html')}">
               <span class="dot"></span>
@@ -57,11 +44,9 @@ function renderHeaderFooter() {
             <a class="navlink ${page === 'home' ? 'active' : ''}" href="${rel(
       'index.html'
     )}">Início</a>
-
             <a class="navlink ${page === 'app' ? 'active' : ''}" href="${rel(
       'app.html'
-    )}">App</a>
-
+    )}">Minha área</a>
             <a class="navlink ${page === 'admin' ? 'active' : ''}" href="${rel(
       'admin.html'
     )}">Admin</a>
@@ -92,7 +77,7 @@ function renderHeaderFooter() {
           <div>© ${new Date().getFullYear()} AVA • Protótipo</div>
           <div class="footer-links">
             <a href="${rel('index.html')}">Home</a>
-            <a href="${rel('app.html')}">App</a>
+            <a href="${rel('app.html')}">Minha área</a>
             <a href="${rel('admin.html')}">Admin</a>
           </div>
         </div>
@@ -103,193 +88,164 @@ function renderHeaderFooter() {
 
 function renderSidebar() {
   const host = document.getElementById('site-sidebar');
-  if (!host) {
-    document.body.classList.remove('has-sidebar');
-    return;
-  }
+  if (!host) return;
 
-  const page = getActivePage();
   document.body.classList.add('has-sidebar');
 
   host.innerHTML = `
     <aside class="site-sidebar" aria-label="Menu lateral">
-      <div class="side-group">
-        <a class="side-item ${page === 'app' ? 'active' : ''}" href="${rel(
-    'app.html'
-  )}">
+      <div class="side-top">
+        <div class="side-title">Menu</div>
+        <button class="icon-btn" id="sidebar-collapse" type="button" aria-label="Recolher">
+          <i class="bx bx-chevrons-left"></i>
+        </button>
+      </div>
+
+      <nav class="side-nav">
+        <a class="side-item" href="${rel('app.html')}" data-side="app">
           <i class="bx bx-grid-alt"></i>
           <span class="side-label">Minha área</span>
         </a>
 
-        <a class="side-item ${page === 'admin' ? 'active' : ''}" href="${rel(
-    'admin.html'
-  )}">
+        <a class="side-item" href="${rel('admin.html')}" data-side="admin">
           <i class="bx bx-cog"></i>
           <span class="side-label">Admin</span>
         </a>
 
-        <a class="side-item ${page === 'home' ? 'active' : ''}" href="${rel(
-    'index.html'
-  )}">
+        <a class="side-item" href="${rel('index.html')}" data-side="home">
           <i class="bx bx-home"></i>
           <span class="side-label">Início</span>
         </a>
+      </nav>
 
-        <div class="side-divider"></div>
-
-        <div id="side-user" class="badge" style="display:none; justify-content:flex-start;">
-          <i class="bx bx-user"></i>
-          <span id="side-user-email" class="side-label"></span>
-        </div>
-
-        <button id="side-logout" class="side-item" style="display:none;">
+      <div class="side-bottom">
+        <button class="side-item danger" id="side-logout" type="button">
           <i class="bx bx-log-out"></i>
           <span class="side-label">Sair</span>
         </button>
       </div>
     </aside>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
   `;
 
-  // overlay (se existir no HTML, só usamos; se não, criamos)
-  let overlay = document.getElementById('sidebar-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'sidebar-overlay';
-    overlay.className = 'sidebar-overlay';
-    document.body.appendChild(overlay);
-  } else {
-    overlay.classList.add('sidebar-overlay');
+  // ativo
+  const page = getActivePage();
+  host.querySelectorAll('[data-side]').forEach((a) => {
+    if (a.getAttribute('data-side') === page) a.classList.add('active');
+  });
+
+  // estado recolhido
+  const collapsed = localStorage.getItem('ava_sidebar_collapsed') === '1';
+  document.body.classList.toggle('sidebar-collapsed', collapsed);
+
+  const overlay = document.getElementById('sidebar-overlay');
+  const toggle = document.getElementById('sidebar-toggle');
+  const collapse = document.getElementById('sidebar-collapse');
+
+  function openMobile() {
+    document.body.classList.add('sidebar-open');
+    if (overlay) overlay.style.display = 'block';
+  }
+  function closeMobile() {
+    document.body.classList.remove('sidebar-open');
+    if (overlay) overlay.style.display = 'none';
   }
 
-  // Toggle no header
-  const btnToggle = document.getElementById('sidebar-toggle');
-  if (btnToggle) {
-    btnToggle.onclick = () => {
-      document.body.classList.toggle('sidebar-open');
-    };
-  }
+  toggle?.addEventListener('click', () => {
+    // mobile: abre overlay
+    if (window.matchMedia('(max-width: 980px)').matches) {
+      if (document.body.classList.contains('sidebar-open')) closeMobile();
+      else openMobile();
+      return;
+    }
+    // desktop: alterna recolhido
+    const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+    localStorage.setItem('ava_sidebar_collapsed', isCollapsed ? '1' : '0');
+  });
 
-  // Click no overlay fecha
-  overlay.onclick = () => document.body.classList.remove('sidebar-open');
+  collapse?.addEventListener('click', () => {
+    const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+    localStorage.setItem('ava_sidebar_collapsed', isCollapsed ? '1' : '0');
+  });
 
-  // ESC fecha
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.body.classList.remove('sidebar-open');
+  overlay?.addEventListener('click', closeMobile);
+  window.addEventListener('resize', () => {
+    if (!window.matchMedia('(max-width: 980px)').matches) closeMobile();
+  });
+
+  // logout no sidebar
+  const sideLogout = document.getElementById('side-logout');
+  sideLogout?.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    window.location.assign(rel('index.html'));
   });
 }
 
-function setAuthUI(session) {
+function redirectToLogin(next) {
+  const u = new URL(rel('login.html'));
+  if (next) u.searchParams.set('next', next);
+  window.location.assign(u.toString());
+}
+
+async function syncAuthUI() {
   const authLink = document.getElementById('auth-link');
   const logoutBtn = document.getElementById('logout-btn');
   const userPill = document.getElementById('user-pill');
   const userEmail = document.getElementById('user-email');
 
-  const sideUser = document.getElementById('side-user');
-  const sideUserEmail = document.getElementById('side-user-email');
-  const sideLogout = document.getElementById('side-logout');
+  if (!authLink || !logoutBtn) return;
 
-  const isAuthed = !!session;
+  const { data, error } = await supabase.auth.getSession();
+  if (error) return;
+
+  const session = data?.session;
   const email = session?.user?.email || '';
 
-  if (isAuthed) {
-    if (authLink) {
-      authLink.href = rel('app.html');
-      authLink.innerHTML = `<i class="bx bx-grid-alt"></i> Ir para o App`;
-    }
+  document.body.classList.toggle('is-authed', !!session);
 
-    if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+  // proteção de rota
+  const authNeed = document.body.dataset.auth || '';
+  if (authNeed === 'required' && !session) {
+    redirectToLogin(
+      `${getActivePage()}.html`.replace('home.html', 'index.html')
+    );
+    return;
+  }
+  if (authNeed === 'admin' && !session) {
+    redirectToLogin('admin.html');
+    return;
+  }
+
+  if (session) {
+    authLink.href = rel('app.html');
+    authLink.innerHTML = `<i class="bx bx-grid-alt"></i> Ir para o App`;
+
+    logoutBtn.style.display = 'inline-flex';
     if (userPill && userEmail) {
       userPill.style.display = 'inline-flex';
       userEmail.textContent = email || 'sessão ativa';
     }
-
-    if (sideUser && sideUserEmail) {
-      sideUser.style.display = 'inline-flex';
-      sideUserEmail.textContent = email || 'sessão ativa';
-    }
-    if (sideLogout) sideLogout.style.display = 'flex';
   } else {
-    if (authLink) {
-      authLink.href = rel('login.html');
-      authLink.innerHTML = `<i class="bx bx-log-in"></i> Entrar`;
-    }
-    if (logoutBtn) logoutBtn.style.display = 'none';
+    authLink.href = rel('login.html');
+    authLink.innerHTML = `<i class="bx bx-log-in"></i> Entrar`;
+
+    logoutBtn.style.display = 'none';
     if (userPill) userPill.style.display = 'none';
-
-    if (sideUser) sideUser.style.display = 'none';
-    if (sideLogout) sideLogout.style.display = 'none';
   }
+
+  logoutBtn.onclick = async () => {
+    await supabase.auth.signOut();
+    window.location.assign(rel('index.html'));
+  };
 }
 
-async function loadSupabaseSafe() {
-  try {
-    const mod = await import('./supabaseClient.js');
-    return mod?.supabase || null;
-  } catch (e) {
-    // Falhou carregar supabaseClient.js -> layout continua funcionando
-    console.warn('[layout] Supabase não carregou:', e?.message || e);
-    return null;
-  }
+function watchAuthChanges() {
+  supabase.auth.onAuthStateChange(() => syncAuthUI());
 }
 
-function enforceAuthIfNeeded(session) {
-  const required = document.body.dataset.auth === 'required';
-  if (!required) return;
-
-  if (!session) {
-    window.location.assign(rel('login.html'));
-  }
-}
-
-async function bootAuth() {
-  const supabase = await loadSupabaseSafe();
-  if (!supabase) {
-    // Sem supabase: mantém UI “visitante”
-    setAuthUI(null);
-    return;
-  }
-
-  // Sessão atual
-  const { data, error } = await supabase.auth.getSession();
-  if (error) {
-    console.warn('[layout] erro getSession:', error.message);
-    setAuthUI(null);
-    return;
-  }
-
-  const session = data?.session || null;
-  setAuthUI(session);
-  enforceAuthIfNeeded(session);
-
-  // Logout (topo)
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) {
-    logoutBtn.onclick = async () => {
-      await supabase.auth.signOut();
-      window.location.assign(rel('index.html'));
-    };
-  }
-
-  // Logout (lateral)
-  const sideLogout = document.getElementById('side-logout');
-  if (sideLogout) {
-    sideLogout.onclick = async () => {
-      await supabase.auth.signOut();
-      window.location.assign(rel('index.html'));
-    };
-  }
-
-  // Mudanças de auth em tempo real
-  supabase.auth.onAuthStateChange(async () => {
-    const r = await supabase.auth.getSession();
-    const s = r?.data?.session || null;
-    setAuthUI(s);
-    enforceAuthIfNeeded(s);
-  });
-}
-
-// Boot “blindado”
+// Boot
 renderHeaderFooter();
 renderSidebar();
-setAuthUI(null);
-bootAuth();
+syncAuthUI();
+watchAuthChanges();
