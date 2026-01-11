@@ -4,40 +4,29 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AVA • Minha área</title>
+
     <link rel="stylesheet" href="./assets/css/site.css" />
+    <link rel="stylesheet" href="./assets/css/chrome.css" />
   </head>
 
   <body data-page="app" data-auth="required">
+    <!-- CHROME -->
     <div id="site-header"></div>
-
-    <!-- HOST do menu lateral -->
     <div id="site-sidebar"></div>
-    <div id="sidebar-overlay"></div>
 
     <main class="page">
       <div class="container">
         <section class="card">
           <h1 class="h1">Minha área</h1>
           <p class="muted">
-            Aqui começam os módulos do AVA (cursos, ofertas, módulos, aulas...).
+            Aqui você verá seus cursos. (Esta página exige login.)
           </p>
 
           <div class="hr"></div>
 
-          <div class="grid cols-2">
-            <div class="card">
-              <h2 class="h2">Usuário</h2>
-              <div class="badge" id="userBadge">Carregando.</div>
-            </div>
-
-            <div class="card">
-              <h2 class="h2">Próximos passos</h2>
-              <ul class="muted">
-                <li>Menu lateral (perfil, cursos, notas)</li>
-                <li>Meus cursos (courses + course_offers)</li>
-                <li>Página do curso (módulos e unidades)</li>
-              </ul>
-            </div>
+          <!-- Área do app -->
+          <div id="app-root">
+            <div class="muted">Carregando...</div>
           </div>
 
           <div class="hr"></div>
@@ -48,7 +37,10 @@
 
     <div id="site-footer"></div>
 
-    <script type="module" src="./assets/js/layout.js"></script>
+    <!-- CHROME -->
+    <script type="module" src="./assets/js/chrome.js"></script>
+
+    <!-- App -->
     <script type="module" src="./assets/js/app.js"></script>
   </body>
 </html>
