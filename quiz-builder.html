@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVA3 • Construtor de Quiz</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/css/chrome.css">
+    <link rel="stylesheet" href="./assets/css/admin.css">
+    <link rel="stylesheet" href="./assets/css/editor-styles.css">
+
+    <style>
+        /* Estilos específicos desta página */
+        .feedback-box {
+            background-color: #f8f9fa;
+            border-left: 3px solid #6c757d;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .feedback-box.show { display: block; }
+        
+        .toggle-feedback {
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        .toggle-feedback:hover { text-decoration: underline; }
+        
+        .correct-indicator {
+            cursor: pointer;
+            width: 24px; height: 24px;
+            border: 2px solid #dee2e6;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: transparent;
+            transition: all 0.2s;
+        }
+        .correct-indicator.active {
+            background-color: #198754; border-color: #198754; color: white;
+        }
+        
+        .bank-item-row:hover {
+            background-color: #f8f9fa;
+            border-color: #0d6efd !important;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <div id="site-header"></div>
+    <div id="site-sidebar"></div>
+
+    <main class="page-content">
+        <div class="container-fluid p-4">
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <button id="btn-back" class="btn btn-white border shadow-sm rounded-circle p-2">
+                    <i class='bx bx-arrow-back fs-4'></i>
+                </button>
+                
+                <div class="flex-grow-1">
+                    <h6 class="text-uppercase text-muted fw-bold mb-0 small" id="quiz-hierarchy">Carregando...</h6>
+                    <h3 class="fw-bold text-dark mb-0" id="quiz-title">...</h3>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-end lh-1">
+                        <small class="text-muted d-block" style="font-size: 0.75rem;">Total</small>
+                        <span class="badge bg-warning text-dark border fs-6 mt-1" id="quiz-points">0 pts</span>
+                    </div>
+                    <button class="btn btn-success fw-bold px-4 shadow-sm" onclick="saveQuiz()">
+                        <i class='bx bx-save me-1'></i> Salvar
+                    </button>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-2 d-flex flex-wrap gap-2 align-items-center bg-white rounded">
+                    
+                    <button class="btn btn-primary btn-sm fw-bold" onclick="modalImportGIFT()">
+                        <i class='bx bx-import'></i> Importar GIFT
+                    </button>
+
+                    <div class="vr mx-2 text-muted"></div>
+
+                    <button class="btn btn-outline-dark btn-sm fw-bold" onclick="openQuestionBank()">
+                        <i class='bx bx-search'></i> Buscar do Banco
+                    </button>
+                    
+                    <div class="vr mx-2 text-muted"></div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small fw-bold text-muted text-uppercase">Modo:</label>
+                        <select id="quiz-mode" class="form-select form-select-sm fw-bold text-dark" style="width: auto;" onchange="updateSettings()">
+                            <option value="manual">Questionário Fixo (Todas)</option>
+                            <option value="bank">Banco de Questões (Sorteio)</option>
+                        </select>
+                    </div>
+
+                    <div id="bank-settings" class="d-flex align-items-center gap-3 bg-light px-3 py-1 rounded border ms-2" style="display:none;">
+                        
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="small fw-bold text-primary">Fonte:</label>
+                            <select id="external-bank-source" class="form-select form-select-sm border-primary" style="width: auto;" onchange="updateSettings()">
+                                <option value="current">Apostila Atual</option>
+                                <option value="global">Banco Global</option>
+                            </select>
+                        </div>
+
+                        <div class="vr text-muted h-50"></div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="small fw-bold text-primary">Sortear:</label>
+                            <input type="number" id="draw-count" class="form-control form-control-sm text-center border-primary fw-bold" style="width: 60px;" value="5" min="1" onchange="updatePointsDisplay()">
+                            <span class="small text-muted fw-bold">itens</span>
+                        </div>
+                    </div>
+
+                    <div class="ms-auto d-flex align-items-center gap-2">
+                        <span class="small text-muted fw-bold">Valor/Questão:</span>
+                        <span class="badge bg-primary" id="points-per-question">0 pts</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    
+                    <div id="questions-list"></div>
+
+                    <div class="text-center py-4 border-2 border-dashed rounded bg-white mt-3 cursor-pointer opacity-75 hover-opacity-100 transition-all" 
+                         style="border-style: dashed; border-color: #cbd5e1;"
+                         onclick="addQuestion()">
+                        <div class="text-primary fw-bold">
+                            <i class='bx bx-plus-circle fs-5 align-middle'></i> Adicionar Manualmente
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 position-sticky" style="top: 20px; background: #fff;">
+                        <h6 class="fw-bold text-dark border-bottom pb-3 mb-3">Resumo</h6>
+                        
+                        <ul class="list-unstyled text-muted small mb-4">
+                            <li class="mb-3 d-flex justify-content-between align-items-center">
+                                <span>Total Cadastrado:</span>
+                                <span class="badge bg-light text-dark border"><strong id="count-total">0</strong></span>
+                            </li>
+                            <li class="mb-3 d-flex justify-content-between align-items-center">
+                                <span>Serão aplicadas:</span>
+                                <span class="badge bg-primary"><strong id="count-applied">0</strong></span>
+                            </li>
+                        </ul>
+
+                        <div id="alert-fixed" class="alert alert-light border small mb-0 text-muted">
+                            <i class='bx bx-info-circle text-primary me-1'></i>
+                            O aluno responderá todas as questões cadastradas nesta ordem.
+                        </div>
+
+                        <div id="alert-bank" class="alert alert-info border-info border-opacity-25 small mb-0 bg-opacity-10 text-primary" style="display: none;">
+                            <i class='bx bx-shuffle me-1'></i>
+                            <strong>Modo Banco:</strong> O sistema sorteará aleatoriamente a quantidade definida a cada tentativa.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="modal fade" id="modalGIFT" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Importar via Texto (GIFT)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    <div class="alert alert-white border shadow-sm small">
+                        <strong>Exemplo:</strong> <code>::Título:: Pergunta { =Correta ~Errada }</code>
+                    </div>
+                    <textarea id="gift-input" class="form-control font-monospace small border-0 shadow-sm p-3" rows="10" placeholder="// Cole aqui..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="processGIFT()">Processar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalBank" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title fw-bold"><i class='bx bx-library'></i> Banco de Questões</h5>
+                        <small class="text-muted">Busque questões de outros módulos e importe para cá.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-8">
+                            <input type="text" id="bank-search" class="form-control" placeholder="Digite para filtrar o enunciado..." onkeyup="filterBank()">
+                        </div>
+                        <div class="col-md-4">
+                            <select id="bank-source-filter" class="form-select" onchange="filterBank()">
+                                <option value="">Todas as Fontes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="bank-list" class="d-flex flex-column gap-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <div class="me-auto text-muted small">
+                        <span id="bank-selected-count" class="fw-bold text-dark">0</span> selecionadas
+                    </div>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="importFromBank()">
+                        <i class='bx bx-plus'></i> Adicionar Selecionadas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <template id="tpl-question">
+        <div class="question-card card mb-3 border shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-secondary question-label">#</span>
+                </div>
+                <button class="btn btn-sm btn-white text-danger border-0 btn-delete"><i class='bx bx-trash fs-5'></i></button>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Enunciado</label>
+                    <textarea class="form-control question-text fw-bold text-dark border-light bg-light" rows="2"></textarea>
+                </div>
+                <div class="mb-3">
+                    <span class="toggle-feedback" onclick="toggleFeedback(this)">
+                        <i class='bx bx-message-detail'></i> Adicionar Feedback Geral
+                    </span>
+                    <div class="feedback-box rounded">
+                        <textarea class="form-control form-control-sm border-0 bg-transparent question-feedback" placeholder="Explicação pós-resposta..."></textarea>
+                    </div>
+                </div>
+                <div class="ps-3 border-start border-3 border-light">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Alternativas</label>
+                    <div class="options-container d-grid gap-2"></div>
+                    <button class="btn btn-light btn-sm text-primary fw-bold mt-3 w-100 border-dashed btn-add-opt">
+                        <i class='bx bx-plus'></i> Adicionar Alternativa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-option">
+        <div class="option-row position-relative">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 ps-2 pe-2">
+                    <div class="correct-indicator"><i class='bx bx-check fw-bold'></i></div>
+                </span>
+                <input type="text" class="form-control border-start-0 option-input" placeholder="Digite a alternativa...">
+                <button class="btn btn-outline-light text-muted border border-start-0 btn-remove-opt"><i class='bx bx-x fs-5'></i></button>
+            </div>
+            <input type="text" class="form-control form-control-sm border-0 bg-transparent text-muted fst-italic ms-5 mt-1 option-feedback" style="display:none;" placeholder="Feedback específico...">
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./assets/js/chrome.js"></script>
+    <script type="module" src="./assets/js/quiz-builder.js"></script>
+    
+    <script>
+        // Função auxiliar visual
+        function toggleFeedback(el) {
+            const box = el.nextElementSibling;
+            box.classList.toggle('show');
+            el.innerHTML = box.classList.contains('show') ? '<i class="bx bx-message-detail"></i> Ocultar Feedback' : '<i class="bx bx-message-detail"></i> Adicionar Feedback Geral';
+        }
+    </script>
+</body>
+</html>

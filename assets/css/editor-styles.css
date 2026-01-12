@@ -1,0 +1,90 @@
+/* ARQUIVO: assets/css/editor-styles.css */
+:root {
+    --primary: #0d6efd;
+    --light-bg: #f8f9fa;
+    --border: #dee2e6;
+    --card-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+body { background-color: var(--light-bg); }
+
+/* --- GERAL --- */
+.cursor-pointer { cursor: pointer; }
+
+.points-badge {
+    background-color: #fff3cd; color: #856404;
+    border: 1px solid #ffeeba; padding: 2px 8px;
+    border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+}
+
+/* --- EDITOR DE CURSO --- */
+.module-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--primary);
+    border-radius: 8px; margin-bottom: 24px;
+    box-shadow: var(--card-shadow);
+}
+.module-header {
+    padding: 15px 20px; background: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; border-bottom: 1px solid #f1f5f9;
+}
+.module-header:hover { background-color: #f8fbff; }
+
+.section-box {
+    margin: 15px 20px;
+    border: 1px solid var(--border);
+    border-radius: 6px; background: #fff;
+    overflow: hidden;
+}
+.section-header {
+    padding: 10px 15px; background: #f1f5f9;
+    border-bottom: 1px solid #e9ecef;
+    display: flex; justify-content: space-between; align-items: center;
+    font-weight: 700; color: #495057; font-size: 0.9rem;
+}
+
+.lesson-item {
+    padding: 12px 15px; background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.2s;
+}
+.lesson-item:hover { background: #fafafa; padding-left: 18px; }
+
+.icon-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 12px; font-size: 1.1rem;
+}
+.ic-video { background: #e7f1ff; color: #0d6efd; }
+.ic-doc { background: #e9ecef; color: #495057; }
+.ic-task { background: #fff3cd; color: #ffc107; }
+
+/* --- QUIZ BUILDER --- */
+.question-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+}
+.question-header {
+    background: #f8fafc; padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.correct-indicator {
+    width: 24px; height: 24px; border: 2px solid #cbd5e1;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: transparent; transition: all 0.2s;
+}
+.correct-indicator.active {
+    background: #198754; border-color: #198754; color: #fff;
+}
+
+/* --- DRAWER --- */
+.preview-container {
+    width: 100%; min-height: 400px;
+    background: #f8f9fa; border: 1px dashed #ccc;
+    display: flex; align-items: center; justify-content: center;
+}
