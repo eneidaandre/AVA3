@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVA3 • Sala de Aula</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/css/chrome.css">
+    
+    <style>
+        /* --- FORÇAR LAYOUT APP (SEM GAPS) --- */
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #fff; }
+
+        /* Ajuste do Body para colar no menu encolhido e header */
+        body { 
+            padding-top: 64px !important; 
+            padding-left: 60px !important; 
+        }
+
+        /* FORÇAR MENU DO SISTEMA ENCOLHIDO */
+        #site-sidebar {
+            width: 60px !important;
+            transition: width 0.3s ease;
+            z-index: 9999 !important;
+            overflow: hidden;
+        }
+        #site-sidebar .label-text, #site-sidebar .side-title { display: none !important; opacity: 0; }
+        #site-sidebar .side-item { justify-content: center !important; padding: 15px 0 !important; }
+        #site-sidebar .side-item i { margin: 0 !important; font-size: 1.4rem; }
+
+        /* Expande por cima ao passar o mouse */
+        #site-sidebar:hover { width: 260px !important; box-shadow: 5px 0 30px rgba(0,0,0,0.2); }
+        #site-sidebar:hover .label-text { display: inline !important; opacity: 1; margin-left: 10px; }
+        #site-sidebar:hover .side-item { justify-content: flex-start !important; padding-left: 20px !important; }
+
+        /* --- CONTAINER DA SALA (COLADO) --- */
+        .classroom-layout {
+            position: fixed;
+            top: 64px; left: 60px; right: 0; bottom: 0;
+            display: flex; flex-direction: column;
+            background-color: #f8f9fa;
+            z-index: 50;
+        }
+
+        /* Cabeçalho de Informações do Curso */
+        .classroom-header {
+            height: 60px; background: #fff; border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; flex-shrink: 0;
+        }
+        .header-info h2 { font-size: 1rem; font-weight: 800; color: #1e293b; margin: 0; }
+        .header-info p { font-size: 0.8rem; color: #64748b; margin: 0; }
+
+        /* Corpo Principal */
+        .classroom-body { display: flex; flex: 1; overflow: hidden; }
+
+        /* Barra Lateral do Curso */
+        .course-nav {
+            width: 320px; background: #fff; border-right: 1px solid #e2e8f0;
+            display: flex; flex-direction: column; flex-shrink: 0; transition: margin-left 0.3s ease;
+        }
+        .course-nav.closed { margin-left: -320px; }
+
+        /* Itens de Aula */
+        #modules-list { flex: 1; overflow-y: auto; }
+        .lesson-item {
+            padding: 12px 20px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem; color: #475569; display: flex; align-items: center; gap: 10px;
+        }
+        .lesson-item.active { background-color: #eef2ff; border-left: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
+        .lesson-item.completed i.bx-check-circle { color: #10b981; }
+
+        /* Progresso no Módulo */
+        .mod-progress-track { height: 3px; background: #e2e8f0; width: 100%; margin-top: 5px; border-radius: 2px; }
+        .mod-progress-bar { height: 100%; background: #10b981; width: 0%; transition: width 0.5s; }
+
+        /* Área de Conteúdo */
+        .content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8f9fa; }
+        .content-header { height: 50px; border-bottom: 1px solid #dee2e6; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: #fff; }
+        .content-scrollable { flex: 1; overflow-y: auto; }
+
+        /* Player */
+        .player-frame { width: 100%; background: #000; aspect-ratio: 16/9; max-height: 80vh; display: flex; align-items: center; justify-content: center; }
+        .player-frame iframe { width: 100%; height: 100%; border: 0; }
+
+        /* Estilos de Botão e Abas */
+        .btn-toggle { background: none; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px; display: flex; }
+        .nav-clean { display: flex; gap: 20px; height: 100%; }
+        .nav-clean .nav-link { border: none; background: none; color: #64748b; font-weight: 600; height: 100%; border-bottom: 2px solid transparent; padding: 0 5px; }
+        .nav-clean .nav-link.active { color: #0b57d0; border-bottom-color: #0b57d0; }
+    </style>
+</head>
+
+<body class="sidebar-collapsed">
+
+    <div id="site-header"></div>
+    <div id="site-sidebar"></div>
+
+    <div class="classroom-layout">
+        <header class="classroom-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="app.html" class="btn btn-light border btn-sm rounded-circle"><i class='bx bx-arrow-back'></i></a>
+                <div class="header-info">
+                    <h2 id="header-course-title">...</h2>
+                    <p id="header-class-name">...</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="progress" style="width: 100px; height: 8px;"><div class="progress-bar bg-success" id="overall-progress" style="width: 0%"></div></div>
+                <small class="fw-bold text-success" id="progress-text">0%</small>
+                <div class="vr opacity-25 mx-2"></div>
+                <a href="app.html" class="btn btn-sm btn-outline-danger border-0 fw-bold"><i class='bx bx-log-out-circle'></i> Sair</a>
+            </div>
+        </header>
+
+        <div class="classroom-body">
+            <aside class="course-nav" id="course-nav">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                    <span class="small fw-bold text-muted uppercase">Conteúdo</span>
+                    <button class="btn-toggle" id="btn-close-menu"><i class='bx bx-chevron-left'></i></button>
+                </div>
+                <div id="modules-list" class="accordion accordion-flush"></div>
+            </aside>
+
+            <section class="content-area">
+                <div class="content-header">
+                    <button class="btn-toggle d-none" id="btn-open-menu"><i class='bx bx-menu'></i></button>
+                    <div class="nav-clean nav" role="tablist">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-aula">Aula</button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-mural">Mural</button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-notas">Notas</button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-relatorio">Relatório</button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-calendario">Calendário</button>
+                    </div>
+                </div>
+
+                <div class="content-scrollable tab-content">
+                    <div class="tab-pane fade show active" id="tab-aula">
+                        <div id="player-frame" class="bg-black" style="display:none;"></div>
+                        <div class="p-4 p-md-5 bg-white mx-auto shadow-sm" style="max-width: 900px; min-height: 100%;">
+                            <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+                                <div><span class="badge bg-secondary mb-2" id="lbl-type">...</span><h3 class="fw-bold" id="lbl-title">Bem-vindo</h3></div>
+                                <button class="btn btn-outline-success rounded-pill fw-bold" id="btn-finish" onclick="finishLesson()" disabled><i class='bx bx-check'></i> Concluir</button>
+                            </div>
+                            <div id="lbl-desc" class="text-secondary lh-lg mb-5"></div>
+                            <div id="activity-area"></div>
+                            <div class="d-flex justify-content-between pt-5 mt-5 border-top">
+                                <button class="btn btn-light border px-4" id="btn-prev" disabled>Anterior</button>
+                                <button class="btn btn-primary px-4" id="btn-next" disabled>Próxima</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade p-5" id="tab-mural"><div id="wall-container"></div></div>
+                    <div class="tab-pane fade p-5" id="tab-notas"><div id="grades-list"></div></div>
+                    <div class="tab-pane fade p-5" id="tab-relatorio"><div id="report-details"></div></div>
+                    <div class="tab-pane fade p-5" id="tab-calendario"><div id="calendar-feed"></div></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./assets/js/chrome.js"></script>
+    <script type="module" src="./assets/js/classroom.js"></script>
+    <script>
+        const nav = document.getElementById('course-nav');
+        const btnClose = document.getElementById('btn-close-menu');
+        const btnOpen = document.getElementById('btn-open-menu');
+        if(nav && btnClose && btnOpen) {
+            btnClose.onclick = () => { nav.classList.add('closed'); btnClose.style.display = 'none'; btnOpen.classList.remove('d-none'); };
+            btnOpen.onclick = () => { nav.classList.remove('closed'); btnOpen.classList.add('d-none'); btnClose.style.display = 'flex'; };
+        }
+    </script>
+</body>
+</html>

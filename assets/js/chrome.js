@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient.js';
-import { goTo } from './router.js';
+// Se tiver import { goTo } ... mantenha, se não usar, pode remover.
 
 const LAYOUT_URL = './assets/chrome.html';
 
@@ -9,6 +9,7 @@ async function initChrome() {
   ensureSlot('site-footer');
 
   try {
+    // 1. Carrega o HTML do menu
     const res = await fetch(LAYOUT_URL);
     if (!res.ok) throw new Error('Falha ao carregar menu');
     const text = await res.text();
@@ -22,43 +23,62 @@ async function initChrome() {
     document.body.classList.add('has-sidebar');
     restoreState();
 
-    // Verificação de auth
+    // 2. Tenta restaurar visualmente o estado ADMIN antes mesmo de checar no banco
+    // Isso evita que o menu "suma" enquanto carrega
+    applyCachedRole();
+
+    // 3. Verificação real de auth (Banco de dados)
     await checkAuth();
 
-    supabase.auth.onAuthStateChange(() => checkAuth());
+    // Monitora mudanças (login/logout em outras abas)
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT') {
+            localStorage.removeItem('ava3_role'); // Limpa cache ao sair
+            window.location.href = 'login.html';
+        } else {
+            checkAuth();
+        }
+    });
+
   } catch (err) {
     console.error('Erro no Chrome:', err);
   }
 }
 
-async function checkAuth() {
-  try {
-    // Busca elementos
-    const nameEl = document.getElementById('user-name');
-    const pillEl = document.getElementById('user-pill');
-    const userPillContainer = document.getElementById('user-pill'); // O container do header
-    const authActions = document.getElementById('auth-actions');
-
-    // Elementos do Admin (IDs baseados no seu chrome.html)
+// Aplica visualmente o que está salvo no navegador para não piscar
+function applyCachedRole() {
+    const cachedRole = localStorage.getItem('ava3_role');
     const adminLink = document.getElementById('link-admin');
     const adminGroup = document.getElementById('sidebar-admin-group');
+
+    if (cachedRole === 'admin') {
+        if (adminLink) adminLink.style.display = 'flex';
+        if (adminGroup) adminGroup.style.display = 'block';
+    }
+}
+
+async function checkAuth() {
+  try {
+    const nameEl = document.getElementById('user-name');
+    const userPillContainer = document.getElementById('user-pill');
+    const authActions = document.getElementById('auth-actions');
     const logoutBtn = document.getElementById('side-logout');
+    
+    // Elementos Admin
+    const adminLink = document.getElementById('link-admin');
+    const adminGroup = document.getElementById('sidebar-admin-group');
 
-    // 1. Reseta estado (Esconde Admin e Botão Sair por segurança)
-    if (adminLink) adminLink.style.display = 'none';
-    if (adminGroup) adminGroup.style.display = 'none';
-    if (logoutBtn) logoutBtn.style.display = 'none';
-
-    // 2. Verifica Sessão
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
+    // 1. Verifica Sessão Local do Supabase
+    const { data: { session }, error } = await supabase.auth.getSession();
 
     if (!session) {
       // Visitante
       if (userPillContainer) userPillContainer.style.display = 'none';
       if (authActions) authActions.style.display = 'block';
+      
+      // Esconde admin se não tiver sessão
+      if (adminLink) adminLink.style.display = 'none';
+      if (adminGroup) adminGroup.style.display = 'none';
       return;
     }
 
@@ -66,50 +86,51 @@ async function checkAuth() {
     if (authActions) authActions.style.display = 'none';
     if (userPillContainer) userPillContainer.style.display = 'flex';
 
-    // Libera botão sair
+    // Botão Sair
     if (logoutBtn) {
       logoutBtn.style.display = 'flex';
       logoutBtn.onclick = async () => {
+        localStorage.removeItem('ava3_role'); // Limpa cache
         await supabase.auth.signOut();
         window.location.href = 'login.html';
       };
     }
 
-    // 3. Busca Perfil no Banco
-    const { data: rows, error: dbError } = await supabase
+    // 2. Busca Perfil no Banco para confirmar Role
+    const { data: rows } = await supabase
       .from('profiles')
       .select('name, role')
       .eq('id', session.user.id)
       .limit(1);
 
-    if (dbError) console.warn('Erro ao ler perfil:', dbError.message);
-
     const profile = rows?.[0];
 
-    // Atualiza nome
+    // Atualiza nome na tela
     const displayName = profile?.name || session.user.email;
     if (nameEl) nameEl.textContent = displayName;
 
-    // --- VERIFICAÇÃO DE ADMIN ---
-    // Normaliza para minúsculo e remove espaços
+    // --- LÓGICA DE ADMIN (CACHEADA) ---
     const roleRaw = profile?.role;
     const role = roleRaw ? String(roleRaw).toLowerCase().trim() : 'aluno';
 
-    console.log(`[Auth] Usuário: ${session.user.email} | Cargo: "${role}"`);
+    // Salva no navegador para a próxima vez ser instantâneo
+    localStorage.setItem('ava3_role', role);
 
+    // Aplica visibilidade final baseada no banco
     if (role === 'admin') {
-      console.log('✅ Acesso Admin Liberado');
-
-      // Mostra itens do menu
-      if (adminLink) adminLink.style.display = 'flex'; // Link topo
-      if (adminGroup) adminGroup.style.display = 'block'; // Grupo lateral
+      if (adminLink) adminLink.style.display = 'flex';
+      if (adminGroup) adminGroup.style.display = 'block';
+    } else {
+      if (adminLink) adminLink.style.display = 'none';
+      if (adminGroup) adminGroup.style.display = 'none';
     }
+
   } catch (e) {
     console.error('Erro no checkAuth:', e);
   }
 }
 
-// Funções Auxiliares (Mantidas idênticas para preservar layout)
+// Funções Auxiliares
 function ensureSlot(id) {
   if (!document.getElementById(id)) {
     const div = document.createElement('div');

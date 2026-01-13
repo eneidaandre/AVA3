@@ -69,7 +69,7 @@
                             <div>
                                 <div class="stat-label">Turmas</div>
                                 <div class="stat-number" id="count-offers">-</div>
-                                <button class="btn btn-link p-0 text-decoration-none text-warning-custom" onclick="window.showPanel('offers')">
+                                <button class="btn btn-link p-0 text-decoration-none text-warning-custom" onclick="window.location.href='class-manager.html'">
                                     Gerenciar Turmas <i class='bx bx-right-arrow-alt'></i>
                                 </button>
                             </div>
@@ -82,7 +82,7 @@
                     
                     <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-bold text-dark" id="panel-title">Cursos Recentes</h5>
-                        </div>
+                    </div>
 
                     <div class="card-body p-0">
                         
@@ -97,11 +97,9 @@
                                             <th class="text-end pe-4">Ações</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="table-courses">
-                                        </tbody>
+                                    <tbody id="table-courses"></tbody>
                                 </table>
                             </div>
-                            
                             <div class="p-4 border-top text-end bg-light bg-opacity-10">
                                 <button class="btn btn-primary rounded-pill px-4" onclick="window.openNewCourseModal()">
                                     <i class='bx bx-plus'></i> Novo Curso
@@ -120,8 +118,9 @@
                         </div>
 
                          <div id="panel-offers" class="admin-panel p-5 text-center" style="display: none;">
-                            <i class='bx bx-calendar-x fs-1 text-muted mb-3'></i>
-                            <p class="text-muted">Gestão de turmas em breve.</p>
+                            <i class='bx bx-link-external fs-1 text-muted mb-3'></i>
+                            <p class="text-muted">O gerenciamento de turmas agora é feito em uma página dedicada.</p>
+                            <a href="class-manager.html" class="btn btn-outline-warning">Ir para Gestão de Turmas</a>
                         </div>
 
                     </div>

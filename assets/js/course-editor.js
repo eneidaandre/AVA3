@@ -1,4 +1,3 @@
-/* ARQUIVO: assets/js/course-editor.js */
 import { supabase } from './supabaseClient.js';
 
 // --- VARIÁVEIS GLOBAIS ---
@@ -108,7 +107,10 @@ function renderizarGrade() {
     const tplModule = document.getElementById('tpl-module');
     const tplSection = document.getElementById('tpl-section');
     const tplLesson = document.getElementById('tpl-lesson');
+    
+    // Templates de Botões
     const tplBtnQuiz = document.getElementById('tpl-btn-quiz');
+    const tplBtnTask = document.getElementById('tpl-btn-task'); // NOVO
 
     dadosCurso.modulos.forEach(mod => {
         const modClone = tplModule.content.cloneNode(true);
@@ -143,8 +145,10 @@ function renderizarGrade() {
                         let icone = 'bx-file', classeIcone = 'ic-doc';
                         const tipo = (cont.type || 'TEXTO').toUpperCase();
                         
+                        // Configuração de Ícones
                         if (tipo === 'VIDEO_AULA') { icone = 'bx-play'; classeIcone = 'ic-video'; }
                         if (tipo === 'QUIZ') { icone = 'bx-trophy'; classeIcone = 'ic-task'; }
+                        if (tipo === 'TAREFA') { icone = 'bx-task'; classeIcone = 'ic-task'; } // Ícone para Tarefa
 
                         const iconEl = lessonClone.querySelector('.icon-circle');
                         iconEl.className = `icon-circle ${classeIcone}`;
@@ -162,12 +166,20 @@ function renderizarGrade() {
                         // Preview
                         lessonClone.querySelector('.lesson-click-area').onclick = () => verPreview(cont);
 
-                        // Botão Quiz
                         const actionArea = lessonClone.querySelector('.actions-area');
+                        
+                        // LÓGICA DO BOTÃO QUIZ (Já existia)
                         if (tipo === 'QUIZ') {
                             const btnQuizClone = tplBtnQuiz.content.cloneNode(true);
                             btnQuizClone.querySelector('a').href = `quiz-builder.html?id=${cont.id}`; 
                             actionArea.insertBefore(btnQuizClone, actionArea.firstChild);
+                        }
+
+                        // LÓGICA DO BOTÃO TAREFA (NOVO)
+                        if (tipo === 'TAREFA') {
+                            const btnTaskClone = tplBtnTask.content.cloneNode(true);
+                            btnTaskClone.querySelector('a').href = `task-builder.html?id=${cont.id}`; 
+                            actionArea.insertBefore(btnTaskClone, actionArea.firstChild);
                         }
 
                         lessonClone.querySelector('.btn-preview').onclick = () => verPreview(cont);
@@ -184,7 +196,7 @@ function renderizarGrade() {
     });
 }
 
-// --- 4. PREVIEW ---
+// --- 4. PREVIEW INTELIGENTE ---
 window.verPreview = function(item) {
     if (!item) return;
     const tipo = (item.type || 'TEXTO').toUpperCase();
@@ -195,21 +207,56 @@ window.verPreview = function(item) {
     const previewContent = document.getElementById('previewContent');
     const quizArea = document.getElementById('quiz-action-area');
     const btnQuiz = document.getElementById('btn-config-quiz');
+    
+    // (Se tiver taskArea/btnTask, adicione aqui as variáveis também)
+
+    // Reseta áreas
+    if(quizArea) quizArea.style.display = 'none';
+    // if(taskArea) taskArea.style.display = 'none';
 
     if (tipo === 'QUIZ') {
-        quizArea.style.display = 'block';
-        btnQuiz.href = `quiz-builder.html?id=${item.id}`;
+        if(quizArea) {
+            quizArea.style.display = 'block';
+            btnQuiz.href = `quiz-builder.html?id=${item.id}`;
+        }
         previewContent.innerHTML = `<div class="text-center p-5"><i class='bx bx-trophy fs-1 text-warning mb-3'></i><h5>Quiz Interativo</h5></div>`;
+    
+    } else if (tipo === 'TAREFA') {
+        // Se tiver lógica de tarefa
+        previewContent.innerHTML = `<div class="text-center p-5"><i class='bx bx-task fs-1 text-success mb-3'></i><h5>Tarefa / Atividade</h5></div>`;
+        
     } else {
-        quizArea.style.display = 'none';
+        // LÓGICA DE TRATAMENTO DE URL (YOUTUBE / DRIVE)
         if (item.content_url && item.content_url.includes('http')) {
-            let url = item.content_url;
-            if(url.includes('youtube.com/watch')) url = url.replace('watch?v=', 'embed/');
-            previewContent.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="min-height:400px; border:0" allowfullscreen></iframe>`;
+            let url = item.content_url.trim();
+
+            // 1. Tratamento YouTube
+            if (url.includes('youtube.com/watch')) {
+                // De: youtube.com/watch?v=CODIGO
+                // Para: youtube.com/embed/CODIGO
+                url = url.replace('watch?v=', 'embed/');
+                // Remove parâmetros extras se houver (como &t=...)
+                if(url.includes('&')) url = url.split('&')[0];
+            } else if (url.includes('youtu.be/')) {
+                // De: youtu.be/CODIGO
+                // Para: youtube.com/embed/CODIGO
+                const code = url.split('youtu.be/')[1];
+                url = `https://www.youtube.com/embed/${code}`;
+            }
+
+            // 2. Tratamento Google Drive
+            if (url.includes('drive.google.com') && url.includes('/view')) {
+                // De: .../view?usp=sharing
+                // Para: .../preview
+                url = url.replace('/view', '/preview');
+            }
+
+            previewContent.innerHTML = `<iframe src="${url}" width="100%" height="100%" style="min-height:400px; border:0; border-radius: 8px;" allowfullscreen></iframe>`;
         } else {
-            previewContent.innerHTML = `<div class="p-4">${item.description || 'Sem descrição.'}</div>`;
+            previewContent.innerHTML = `<div class="p-4">${item.description || 'Sem descrição ou link.'}</div>`;
         }
     }
+    
     new bootstrap.Offcanvas(document.getElementById('drawerPreview')).show();
 };
 
@@ -390,171 +437,3 @@ window.excluirGenerico = async (table, id) => {
 function configurarEventos() {
     // Eventos já configurados
 }
-
-// ... (Todo o código anterior) ...
-
-// ============================================================
-// LÓGICA DO BANCO DE QUESTÕES (REUSO)
-// ============================================================
-
-let globalQuestionsBank = []; // Cache temporário das questões carregadas
-
-window.openQuestionBank = async function() {
-    const modal = new bootstrap.Modal(document.getElementById('modalBank'));
-    modal.show();
-
-    // Limpa e mostra loading
-    const container = document.getElementById('bank-list');
-    container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p>Buscando questões...</p></div>';
-
-    // 1. Busca todas as lições que têm quiz_data (exceto a atual)
-    const { data: lessons, error } = await supabase
-        .from('lessons')
-        .select('id, title, quiz_data')
-        .not('quiz_data', 'is', null)
-        .neq('id', lessonId); // Não buscar da própria aula
-
-    if (error) {
-        container.innerHTML = `<div class="alert alert-danger">Erro ao buscar banco: ${error.message}</div>`;
-        return;
-    }
-
-    // 2. Processa e unifica as questões
-    globalQuestionsBank = [];
-    const sources = new Set();
-
-    lessons.forEach(lesson => {
-        // Verifica se o quiz_data tem o formato novo (obj) ou antigo (array)
-        let qArray = [];
-        if (Array.isArray(lesson.quiz_data)) {
-            qArray = lesson.quiz_data;
-        } else if (lesson.quiz_data && lesson.quiz_data.questions) {
-            qArray = lesson.quiz_data.questions;
-        }
-
-        if (qArray.length > 0) {
-            sources.add(lesson.title);
-            qArray.forEach(q => {
-                globalQuestionsBank.push({
-                    source: lesson.title, // De onde veio
-                    originalData: q // Os dados da questão (enunciado, opções...)
-                });
-            });
-        }
-    });
-
-    // 3. Preenche o Select de Filtro de Fontes
-    const sourceSelect = document.getElementById('bank-source-filter');
-    sourceSelect.innerHTML = '<option value="">Todas as Aulas (Fontes)</option>';
-    sources.forEach(source => {
-        sourceSelect.innerHTML += `<option value="${source}">${source}</option>`;
-    });
-
-    // 4. Renderiza a lista
-    renderBankList(globalQuestionsBank);
-};
-
-function renderBankList(questions) {
-    const container = document.getElementById('bank-list');
-    container.innerHTML = '';
-
-    if (questions.length === 0) {
-        container.innerHTML = '<div class="alert alert-warning">Nenhuma questão encontrada em outras aulas.</div>';
-        return;
-    }
-
-    questions.forEach((item, index) => {
-        const q = item.originalData;
-        const textPreview = q.text ? q.text.substring(0, 120) + '...' : '(Sem enunciado)';
-        
-        // Cria o card da questão no banco
-        const div = document.createElement('div');
-        div.className = 'card p-3 shadow-sm border-0 bank-item-row';
-        div.dataset.search = (q.text || '').toLowerCase(); // Para filtro rápido
-        div.dataset.source = item.source; // Para filtro de fonte
-
-        div.innerHTML = `
-            <div class="d-flex gap-3 align-items-start">
-                <div class="form-check">
-                    <input class="form-check-input bank-checkbox" type="checkbox" value="${index}" style="transform: scale(1.3);">
-                </div>
-                <div class="flex-grow-1 cursor-pointer" onclick="this.previousElementSibling.querySelector('input').click()">
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="badge bg-light text-dark border">${item.source}</span>
-                        <span class="badge bg-secondary">${q.options ? q.options.length : 0} alternativas</span>
-                    </div>
-                    <p class="mb-0 fw-bold text-dark" style="font-size: 0.95rem;">${q.text}</p>
-                    ${q.feedback ? `<small class="text-muted"><i class='bx bx-message-detail'></i> Com feedback cadastrado</small>` : ''}
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-
-    // Listener para contar selecionados
-    document.querySelectorAll('.bank-checkbox').forEach(chk => {
-        chk.addEventListener('change', updateBankCount);
-    });
-}
-
-// Filtro em tempo real (Search + Dropdown)
-window.filterBank = function() {
-    const term = document.getElementById('bank-search').value.toLowerCase();
-    const source = document.getElementById('bank-source-filter').value;
-    const rows = document.querySelectorAll('.bank-item-row');
-
-    rows.forEach(row => {
-        const textMatch = row.dataset.search.includes(term);
-        const sourceMatch = source === "" || row.dataset.source === source;
-
-        if (textMatch && sourceMatch) {
-            row.style.display = 'block';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-};
-
-function updateBankCount() {
-    const count = document.querySelectorAll('.bank-checkbox:checked').length;
-    document.getElementById('bank-selected-count').textContent = count;
-}
-
-// Ação Final: Importar
-window.importFromBank = function() {
-    const checkboxes = document.querySelectorAll('.bank-checkbox:checked');
-    let added = 0;
-
-    checkboxes.forEach(chk => {
-        const index = parseInt(chk.value);
-        const bankItem = globalQuestionsBank[index];
-        
-        if (bankItem) {
-            // CLONAGEM PROFUNDA (Importante para não linkar por referência)
-            // Gera um novo ID para a questão importada
-            const newQuestion = JSON.parse(JSON.stringify(bankItem.originalData));
-            newQuestion.id = Date.now() + Math.random(); 
-            
-            quizData.questions.push(newQuestion);
-            added++;
-        }
-    });
-
-    if (added > 0) {
-        renderQuestions();
-        updatePointsDisplay();
-        
-        // Fecha o modal
-        const modalEl = document.getElementById('modalBank');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
-
-        // Feedback visual
-        alert(`${added} questões importadas com sucesso!`);
-        
-        // Rola até o final
-        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 300);
-    } else {
-        alert("Selecione pelo menos uma questão.");
-    }
-};

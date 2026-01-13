@@ -1,5 +1,4 @@
 import { supabase } from './supabaseClient.js';
-import { goTo } from './router.js';
 
 const LAYOUT_URL = './assets/chrome.html';
 
@@ -22,81 +21,107 @@ async function initChrome() {
     document.body.classList.add('has-sidebar');
     restoreState();
 
-    await checkAuth(); // Checa permissão
-
+    await checkAuth(); 
     supabase.auth.onAuthStateChange(() => checkAuth());
+
+    loadMyCourses();
+
   } catch (err) {
     console.error(err);
   }
 }
 
+async function loadMyCourses() {
+    const container = document.getElementById('app-root');
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: enrollments, error } = await supabase
+        .from('class_enrollments')
+        .select(`
+            *,
+            classes (
+                id, name, code,
+                courses (title, description, image_url)
+            )
+        `)
+        .eq('user_id', user.id)
+        .order('joined_at', { ascending: false });
+
+    if (error) {
+        container.innerHTML = `<div class="alert alert-danger">Erro: ${error.message}</div>`;
+        return;
+    }
+
+    if (!enrollments || enrollments.length === 0) {
+        container.innerHTML = `<div class="text-center py-5 text-muted"><h4>Nenhum curso.</h4></div>`;
+        return;
+    }
+
+    container.innerHTML = '<div class="row g-4" id="courses-grid"></div>';
+    const grid = document.getElementById('courses-grid');
+
+    enrollments.forEach(enroll => {
+        const cls = enroll.classes;
+        const course = cls.courses;
+        const progress = enroll.progress_percent || 0;
+        
+        let footerHtml = '';
+        if (enroll.status === 'active') {
+            // CORREÇÃO: Garante que o link use 'id'
+            footerHtml = `<a href="classroom.html?id=${cls.id}" class="btn btn-primary w-100">Acessar Aula</a>`;
+        } else {
+            footerHtml = `<button class="btn btn-secondary w-100" disabled>${enroll.status}</button>`;
+        }
+
+        const col = document.createElement('div');
+        col.className = 'col-md-4';
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">${course.title}</h5>
+                    <p class="card-text text-muted small">${cls.name}</p>
+                    <div class="progress mb-3" style="height: 5px;">
+                        <div class="progress-bar" style="width: ${progress}%"></div>
+                    </div>
+                    ${footerHtml}
+                </div>
+            </div>
+        `;
+        grid.appendChild(col);
+    });
+}
+
+// --- AUTH ---
 async function checkAuth() {
   try {
-    // 1. Pega elementos com segurança (evita o erro TypeError)
-    const nameEl = document.getElementById('user-name');
-    const adminLink = document.getElementById('link-admin'); // Link do topo
-    const adminGroup = document.getElementById('sidebar-admin-group'); // Link lateral
-
-    // 2. Esconde Admin por padrão
-    if (adminLink) adminLink.style.display = 'none';
-    if (adminGroup) adminGroup.style.display = 'none';
-
-    const {
-      data: { session },
-      error: sessErr,
-    } = await supabase.auth.getSession();
-    if (sessErr || !session) return;
-
-    // 3. Atualiza nome na tela (COM PROTEÇÃO)
-    if (nameEl) nameEl.textContent = session.user.email;
-
-    // 4. Busca Role no Banco
-    const { data: rows, error } = await supabase
-      .from('profiles')
-      .select('role, name')
-      .eq('id', session.user.id)
-      .limit(1);
-
-    const profile = rows && rows.length > 0 ? rows[0] : null;
-
-    if (profile) {
-      // Atualiza nome se tiver
-      if (nameEl && profile.name) nameEl.textContent = profile.name;
-
-      // VERIFICAÇÃO DE ADMIN
-      const role = String(profile.role || '')
-        .trim()
-        .toLowerCase();
-      console.log('Cargo do usuário:', role);
-
-      if (role === 'admin') {
-        console.log('LIGANDO MODO ADMIN');
-        if (adminLink) adminLink.style.display = 'block'; // Mostra botão
-        if (adminGroup) adminGroup.style.display = 'block'; // Mostra menu lateral
-
-        // Ativa cliques
-        if (adminLink) wireLink(adminLink);
-      }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        document.getElementById('auth-actions').style.display = 'block';
+        document.getElementById('user-pill').style.display = 'none';
+        return;
     }
-  } catch (e) {
-    console.error('Erro no Auth:', e);
-  }
+    
+    document.getElementById('auth-actions').style.display = 'none';
+    const userPill = document.getElementById('user-pill');
+    if(userPill) userPill.style.display = 'flex';
+    if(document.getElementById('user-name')) document.getElementById('user-name').textContent = session.user.email;
+
+    // Admin Check
+    const { data: rows } = await supabase.from('profiles').select('role').eq('id', session.user.id).limit(1);
+    if (rows && rows[0] && rows[0].role === 'admin') {
+        if(document.getElementById('link-admin')) document.getElementById('link-admin').style.display = 'block';
+        if(document.getElementById('sidebar-admin-group')) document.getElementById('sidebar-admin-group').style.display = 'block';
+    }
+  } catch (e) { console.error(e); }
 }
 
-function wireLink(el) {
-  el.addEventListener('click', (e) => {
-    // Garante navegação
-    window.location.href = el.href;
-  });
-}
-
-// Funções auxiliares de layout
 function ensureSlot(id) {
   if (!document.getElementById(id)) {
     const div = document.createElement('div');
     div.id = id;
-    if (id === 'site-footer') document.body.appendChild(div);
-    else document.body.insertBefore(div, document.body.firstChild);
+    document.body.appendChild(div);
   }
 }
 function inject(id, doc, slot) {
@@ -105,7 +130,8 @@ function inject(id, doc, slot) {
   if (el && content) el.innerHTML = content.innerHTML;
 }
 function restoreState() {
-  /* Lógica do menu lateral... */
+  const btn = document.getElementById('sidebar-toggle');
+  if (btn) btn.onclick = () => document.body.classList.toggle('sidebar-collapsed');
 }
 
 initChrome();

@@ -1,46 +1,218 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AVA • Minha área</title>
+    <title>AVA • Meus Cursos</title>
 
-    <link rel="stylesheet" href="./assets/css/site.css" />
     <link rel="stylesheet" href="./assets/css/chrome.css" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link
-      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-      rel="stylesheet"
-    />
-  </head>
+    <style>
+        /* Fundo com a textura fornecida */
+        body {
+            background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBw0OEA0PDw0NDQ0NDQ0NDQ0NDQ8NDQ0NFREWFhURExMYHSggGBolGxMTITEhJSk3Li4uFx8zODM4NygtOisBCgoKBQUFDgUFDisZExkrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrK//AABEIAKkBKgMBIgACEQEDEQH/xAAaAAEBAQEBAQEAAAAAAAAAAAAAAgEDBAUH/8QAKRABAQEAAgEDBAEDBQAAAAAAAAECAxFBEiExBFFhcZETgbEUQmKh8P/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwD9rXjSanv3B1rKdsugbBuQEqxUkB0AAAAAAAAAAAAAAAAAAAAAAAAAAAAABzqePPfd/j9OXNu9O/DuazLP4ATV2JBuKpE+W2g1uYntWb2CgAAZ2DRPbZQaAAAAAAAAAAAAAAAAAAAAAAADz7jjw69GuvF/y9FjneL1UHoS43h/NJjrzQd5Cwxeyglub7lSDsItT2DowzW0EkrWdAsAAAAAAAAAAAAAAAAAAAAAAAHG1cjhXXi137A1NXU0E5vTpdIzG0C2N455+7lyT2Ppt/7b4+P0DtWKSDJV9pkaB2rKG5oLAAGANEtgNAAAAAAAAAAAAAAAAAB57E5+fZdbjINumXZUUHafDLE8WvC6CLHDcsvcegmQT/X/ABWf1p9quyMsB0nwVGdLoJo2kgN9TfUlgLgmKBg1kBQAAAAAAAAAAAAAAAAAPNdu2eunCxXFrwDpUadOnPkvQI795978Ovqc+DPfer834/TpYDPUvPw5049dA6WJq6mgldrMwsA7bmppmgupUwGVSJ738T/KwLW5SSgsAAGAdtYA0AAAAAAAAAAAHnqc5XVZyCa8n1HJa9XI8nJAez6fkmsz8e1XY+f9Py+jX4vtX0LqfefyCbEydqv7jc5Bl7ZbVWJsBfHrttcs3p2tgJ6T0puYDOkcmrHSuXJAb9Pvv28x1ryd+my/+6eualgMBsBrOxgKlEqgAANAAAAAAAAAAAB4727cWu5+nOxOL1Qd9x5uTL03cc9SUHknH3W+h7M8Xsz0QHDj4vNeri14+yLE99UHeosX6om6BMyqqwywEVeKmsB0qdRXbOwcdYLh3zCwHHGHXF8FYDpWHZ2DGkbQYSjAWMjQAAAAAAAAAAeawxnyy7jtmTqdA52IsddRFgK4N+L/AGXXnz327XYMrlx311a/4z/uuX1H1H2er6b0+mdef8g2xFdLEWAvi14VY4R2ugZYyQulYAqaplgGNLrkuaArG+o4737+QbWVXTAM1SFwGDeiQGgAAAAAAAAAAA8Wovg34ZYnOfcHp1EWF1XO8lBeJ5cuffh1u517PNyQHm27/AEHN1fTfPx+3PUcuvcH2aix4/wDVb/H8Nxz71fHQPXmFbx67jbAc7G8d6v4KnoHbplZ3Yy6oNzG2HHe/22gjURnXVdKjUB2ZWZ7jfcBbJGgAAAAAAAAAAAAAA81XjHUcXpnxActRy07acdg58eur+16jhrx+1aBm8sxjyV1nwCccPqd/RJ7RvB8f3VQTx66r0V5q6TwCrDGfLIvHwCamxdTQTL06uK8/AKpmMXkFdAAAAAAAAAAAAAAAAAA//9k=');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+        }
 
-  <body data-page="app">
+        /* Camada leve para legibilidade, sem criar uma caixa visível */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.4); /* Branco leve para clarear a textura */
+            z-index: -1;
+        }
+
+        /* Container expandido */
+        .main-container {
+            padding-top: 40px;
+            padding-bottom: 60px;
+            max-width: 1400px; /* Mais largo para telas grandes */
+            margin: 0 auto;
+        }
+
+        /* Títulos */
+        .page-title {
+            font-weight: 800;
+            color: #1a1a1a;
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+        }
+        .page-subtitle {
+            color: #555;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        /* --- CARDS MODERNOS --- */
+        .course-card {
+            background: #ffffff; /* Branco puro */
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            /* Sombra suave apenas no card */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Hover Effect: Card sobe e sombra aumenta */
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-header-img {
+            height: 160px;
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); /* Gradiente Padrão Suave */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .card-icon-overlay {
+            font-size: 3.5rem;
+            color: rgba(255,255,255,0.9);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .card-body {
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-code-badge {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .course-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .course-desc {
+            font-size: 0.95rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Barra de Progresso */
+        .progress-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .custom-progress {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .custom-progress-bar {
+            background-color: #3b82f6; /* Azul vibrante */
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Botão */
+        .btn-card-action {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+
+        .btn-start {
+            background-color: #0f172a; /* Dark */
+            color: white;
+        }
+        .btn-start:hover {
+            background-color: #1e293b;
+            color: white;
+        }
+
+        .btn-continue {
+            background-color: #3b82f6; /* Azul */
+            color: white;
+        }
+        .btn-continue:hover {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-locked {
+            background-color: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body data-page="app">
+    
     <div id="site-header"></div>
     <div id="site-sidebar"></div>
 
-    <main class="container">
-      <section
-        class="card"
-        style="
-          background: white;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
-          padding: 30px;
-          margin-top: 20px;
-        "
-      >
-        <h1>Meus Cursos</h1>
-        <p style="color: #666">Painel do aluno.</p>
+    <main class="container-fluid main-container px-4 px-md-5">
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="page-title"><i class='bx bx-book-open text-primary me-2'></i>Meus Cursos</h2>
+                <p class="page-subtitle">Acompanhe seu progresso e continue seus estudos.</p>
+            </div>
+        </div>
 
-        <div style="border-top: 1px solid #eee; margin: 20px 0"></div>
+        <div id="app-root" class="min-vh-50">
+            <div class="text-center py-5">
+                <div class="spinner-border text-secondary" role="status"></div>
+                <p class="mt-3 text-muted fw-bold">Buscando seus cursos...</p>
+            </div>
+        </div>
 
-        <div id="app-root">Carregando...</div>
-      </section>
     </main>
 
     <div id="site-footer"></div>
 
     <script type="module" src="./assets/js/chrome.js"></script>
     <script type="module" src="./assets/js/app.js"></script>
-  </body>
+</body>
 </html>

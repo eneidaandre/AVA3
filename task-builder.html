@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVA3 • Construtor de Tarefas</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/css/chrome.css">
+    <link rel="stylesheet" href="./assets/css/admin.css">
+    <link rel="stylesheet" href="./assets/css/editor-styles.css">
+
+    <style>
+        .task-card {
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+        .task-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        /* Cores visuais para diferenciar tipos */
+        .type-text { border-left-color: #0d6efd; } /* Azul para Texto */
+        .type-link { border-left-color: #198754; } /* Verde para Link */
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <div id="site-header"></div>
+    <div id="site-sidebar"></div>
+
+    <main class="page-content">
+        <div class="container-fluid p-4">
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <button id="btn-back" class="btn btn-white border shadow-sm rounded-circle p-2">
+                    <i class='bx bx-arrow-back fs-4'></i>
+                </button>
+                
+                <div class="flex-grow-1">
+                    <h6 class="text-uppercase text-muted fw-bold mb-0 small" id="task-hierarchy">Carregando...</h6>
+                    <h3 class="fw-bold text-dark mb-0" id="task-title">...</h3>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-end lh-1">
+                        <small class="text-muted d-block" style="font-size: 0.75rem;">Pontos</small>
+                        <span class="badge bg-primary fs-6 mt-1" id="task-points">0 pts</span>
+                    </div>
+                    <button class="btn btn-success fw-bold px-4 shadow-sm" onclick="saveTask()">
+                        <i class='bx bx-save me-1'></i> Salvar Tarefa
+                    </button>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="fw-bold mb-0"><i class='bx bx-notepad'></i> Instruções da Tarefa</h6>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="task-instructions" class="form-control border-0 bg-light" rows="4" placeholder="Descreva aqui o que o aluno deve fazer, critérios de avaliação, etc..."></textarea>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted fw-bold text-uppercase small mb-3">Itens de Resposta</h6>
+                    <div id="task-list" class="d-flex flex-column gap-3"></div>
+
+                    <div class="row mt-4 g-3">
+                        <div class="col-md-6">
+                            <div class="p-4 border-2 border-dashed rounded bg-white text-center cursor-pointer hover-shadow" 
+                                 style="border-style: dashed; border-color: #0d6efd;"
+                                 onclick="addTaskItem('text')">
+                                <i class='bx bx-paragraph fs-1 text-primary mb-2'></i>
+                                <h6 class="fw-bold text-primary mb-0">+ Pergunta Descritiva</h6>
+                                <small class="text-muted">Aluno responde com texto</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 border-2 border-dashed rounded bg-white text-center cursor-pointer hover-shadow" 
+                                 style="border-style: dashed; border-color: #198754;"
+                                 onclick="addTaskItem('link')">
+                                <i class='bx bx-link fs-1 text-success mb-2'></i>
+                                <h6 class="fw-bold text-success mb-0">+ Envio de Arquivo (Link)</h6>
+                                <small class="text-muted">Aluno cola URL (Drive, Dropbox)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 position-sticky" style="top: 20px;">
+                        <h6 class="fw-bold text-dark border-bottom pb-3 mb-3">Resumo da Atividade</h6>
+                        <ul class="list-unstyled text-muted small mb-3">
+                            <li class="d-flex justify-content-between mb-2">
+                                <span>Perguntas Dissertativas:</span>
+                                <strong id="count-text">0</strong>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2">
+                                <span>Envios de Link:</span>
+                                <strong id="count-link">0</strong>
+                            </li>
+                        </ul>
+                        <div class="alert alert-info border-0 bg-info bg-opacity-10 small text-dark">
+                            <i class='bx bx-info-circle me-1'></i>
+                            <strong>Dica:</strong> Para envios de arquivos grandes, solicitamos sempre o link (Google Drive, OneDrive, etc) para não sobrecarregar o servidor.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <template id="tpl-task-item">
+        <div class="card task-card border shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="badge type-badge text-uppercase">TIPO</span>
+                    <button class="btn btn-sm text-danger btn-delete"><i class='bx bx-trash fs-5'></i></button>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Enunciado / Solicitação</label>
+                    <input type="text" class="form-control fw-bold text-dark item-statement" placeholder="Ex: Cole aqui o link do seu projeto...">
+                </div>
+
+                <div class="p-3 bg-light rounded border mt-3 opacity-75 preview-area">
+                    <small class="text-muted fst-italic"><i class='bx bx-user'></i> Área de resposta do aluno...</small>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./assets/js/chrome.js"></script>
+    <script type="module" src="./assets/js/task-builder.js"></script>
+</body>
+</html>
