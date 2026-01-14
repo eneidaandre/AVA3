@@ -51,7 +51,7 @@
                 container.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 50px; background: white; border-radius: 12px; border: 1px dashed #ccc;">
                         <h3>Você ainda não tem cursos.</h3>
-                        <a href="index.html" class="btn-enroll" style="width: auto; padding: 10px 30px;">Ver Turmas</a>
+                        <a href="index.html" class="btn-enroll" style="width: auto; padding: 10px 30px; display:inline-block; margin-top:10px;">Ver Turmas</a>
                     </div>`;
                 return;
             }
@@ -59,11 +59,8 @@
             enrollments.forEach(enroll => {
                 const cls = enroll.classes;
                 const completed = enroll.grades?.completed?.length || 0;
-                const progressWidth = Math.min(100, completed * 5); 
+                const progressWidth = Math.min(100, completed * 5); // Estimativa visual
 
-                // LÓGICA INVERTIDA AQUI:
-                // Badge = Turma (cls.name)
-                // Título = Curso (cls.courses.title)
                 const html = `
                     <article class="course-card">
                         <div class="card-header-img"><i class='bx bx-book-bookmark'></i></div>
@@ -72,15 +69,19 @@
                             <h3 class="card-title">${cls.courses?.title || 'Curso'}</h3>
                             
                             <div class="card-meta">
-                                <div class="d-flex justify-content-between align-items-center w-100">
-                                    <small>Progresso</small>
-                                    <small class="fw-bold">${completed} lições</small>
+                                <div class="progress-info">
+                                    <span>Progresso</span>
+                                    <span class="text-bold">${completed} lições</span>
                                 </div>
-                                <div class="progress-container"><div class="progress-bar" style="width: ${progressWidth}%"></div></div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: ${progressWidth}%"></div>
+                                </div>
                             </div>
 
                             <div class="card-footer">
-                                <a href="classroom.html?id=${cls.id}" class="btn-enroll">Continuar</a>
+                                <a href="classroom.html?id=${cls.id}" class="btn-enroll">
+                                    Continuar
+                                </a>
                             </div>
                         </div>
                     </article>`;
