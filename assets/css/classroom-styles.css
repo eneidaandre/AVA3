@@ -73,3 +73,4 @@ body.sidebar-collapsed .classroom-layout { left: 70px !important; }
 .nav-clean .nav-link { border: none; background: none; color: #64748b; font-weight: 600; height: 100%; border-bottom: 3px solid transparent; padding: 0 5px; cursor: pointer; }
 .nav-clean .nav-link.active { color: var(--brand); border-bottom-color: var(--brand); }
 .notification-badge { background-color: #ef4444; color: white; font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 10px; margin-left: 6px; display: none; }
+

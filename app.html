@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AVA3 • Meus Cursos</title>
-    
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link rel="stylesheet" href="./assets/css/chrome.css">
     <link rel="stylesheet" href="./assets/css/site.css">
@@ -15,7 +14,6 @@
     <div id="site-sidebar"></div>
 
     <main class="container">
-        
         <div class="section-header" style="margin-top: 20px;">
             <div class="section-title">
                 <h2>Meus Cursos</h2>
@@ -26,10 +24,8 @@
         <div class="class-grid" id="my-courses-list">
             <div style="text-align: center; grid-column: 1/-1; padding: 40px;">
                 <i class='bx bx-loader-alt bx-spin' style="font-size: 2rem; color: #ccc;"></i>
-                <p class="mt-2 text-muted">Carregando seus cursos...</p>
             </div>
         </div>
-
     </main>
 
     <div id="site-footer"></div>
@@ -46,13 +42,7 @@
             
             const { data: enrollments, error } = await supabase
                 .from('class_enrollments')
-                .select(`
-                    *,
-                    classes (
-                        id, name, 
-                        courses (title)
-                    )
-                `)
+                .select(`*, classes (id, name, courses (title))`)
                 .eq('user_id', session.user.id);
 
             container.innerHTML = '';
@@ -61,7 +51,6 @@
                 container.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 50px; background: white; border-radius: 12px; border: 1px dashed #ccc;">
                         <h3>Você ainda não tem cursos.</h3>
-                        <p>Vá para a página inicial e inscreva-se em uma turma.</p>
                         <a href="index.html" class="btn-enroll" style="width: auto; padding: 10px 30px;">Ver Turmas</a>
                     </div>`;
                 return;
@@ -70,36 +59,31 @@
             enrollments.forEach(enroll => {
                 const cls = enroll.classes;
                 const completed = enroll.grades?.completed?.length || 0;
-                // Exemplo visual de progresso (pode ajustar a lógica se tiver o total)
                 const progressWidth = Math.min(100, completed * 5); 
 
+                // LÓGICA INVERTIDA AQUI:
+                // Badge = Turma (cls.name)
+                // Título = Curso (cls.courses.title)
                 const html = `
                     <article class="course-card">
-                        <div class="card-header-img">
-                            <i class='bx bx-book-bookmark'></i>
-                        </div>
+                        <div class="card-header-img"><i class='bx bx-book-bookmark'></i></div>
                         <div class="card-body">
-                            <div class="badge-course">${cls.courses?.title || 'Curso'}</div>
-                            <h3 class="card-title">${cls.name}</h3>
+                            <div class="badge-course">${cls.name}</div>
+                            <h3 class="card-title">${cls.courses?.title || 'Curso'}</h3>
                             
                             <div class="card-meta">
                                 <div class="d-flex justify-content-between align-items-center w-100">
                                     <small>Progresso</small>
                                     <small class="fw-bold">${completed} lições</small>
                                 </div>
-                                <div class="progress-container">
-                                    <div class="progress-bar" style="width: ${progressWidth}%"></div>
-                                </div>
+                                <div class="progress-container"><div class="progress-bar" style="width: ${progressWidth}%"></div></div>
                             </div>
 
                             <div class="card-footer">
-                                <a href="classroom.html?id=${cls.id}" class="btn-enroll">
-                                    Continuar Estudando
-                                </a>
+                                <a href="classroom.html?id=${cls.id}" class="btn-enroll">Continuar</a>
                             </div>
                         </div>
-                    </article>
-                `;
+                    </article>`;
                 container.insertAdjacentHTML('beforeend', html);
             });
         });

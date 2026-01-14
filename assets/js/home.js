@@ -1,22 +1,17 @@
 import { supabase } from './supabaseClient.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Verifica sessão (sem forçar login)
+    // Verifica usuário
     const { data: { session } } = await supabase.auth.getSession();
     const userId = session?.user?.id;
 
-    // 2. Carrega turmas
     loadAvailableClasses(userId);
 });
 
 async function loadAvailableClasses(userId) {
     const container = document.getElementById('classes-container');
-    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><i class="bx bx-loader-alt bx-spin" style="font-size: 2rem; color: #0b57d0;"></i></div>';
-
-    // Busca turmas ativas (onde end_date é futuro ou nulo)
-    // Join com Cursos para pegar o título do curso
-    const today = new Date().toISOString().split('T')[0];
     
+    // Busca turmas
     const { data: classes, error } = await supabase
         .from('classes')
         .select(`
@@ -24,69 +19,71 @@ async function loadAvailableClasses(userId) {
             courses (title, description),
             class_enrollments (user_id, status)
         `)
-        // Opcional: filtrar apenas turmas abertas
-        // .or(`end_date.gte.${today},end_date.is.null`) 
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error(error);
-        container.innerHTML = '<p style="text-align:center; color: red;">Erro ao carregar turmas.</p>';
+        console.error("Erro:", error);
+        container.innerHTML = '<p style="text-align:center; color:red;">Não foi possível carregar as turmas.</p>';
         return;
     }
 
     container.innerHTML = '';
 
     if (!classes || classes.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color: #666; grid-column: 1/-1;">Nenhuma turma disponível no momento.</p>';
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: white; border-radius: 16px; border: 1px dashed #ccc;">
+                <i class='bx bx-folder-open' style="font-size: 3rem; color: #ddd;"></i>
+                <h4 class="mt-3 text-muted">Nenhuma turma aberta no momento.</h4>
+            </div>`;
         return;
     }
 
-    // Renderiza Cards
     classes.forEach(cls => {
         const courseTitle = cls.courses?.title || 'Curso Geral';
         
-        // Verifica se usuário já está matriculado
-        let enrollmentStatus = null; // null, pending, active
+        // Verifica status da matrícula
+        let status = null;
         if (userId && cls.class_enrollments) {
             const enrollment = cls.class_enrollments.find(e => e.user_id === userId);
-            if (enrollment) enrollmentStatus = enrollment.status;
+            if (enrollment) status = enrollment.status;
         }
 
-        // Define texto e ação do botão
-        let btnHtml = '';
+        // Configura o botão de ação do card
+        let actionBtn = '';
+        let cardLink = '';
+
         if (!userId) {
-            // Não logado -> Botão leva para login
-            btnHtml = `<button onclick="window.location.href='login.html'" class="btn-enroll"><i class='bx bx-log-in'></i> Entrar para Inscrever-se</button>`;
-        } else if (enrollmentStatus === 'active') {
-            // Já ativo -> Botão Acessar
-            btnHtml = `<button onclick="window.location.href='class-dashboard.html?id=${cls.id}'" class="btn-enroll" style="background-color: #10b981;"><i class='bx bx-play-circle'></i> Acessar Aula</button>`;
-        } else if (enrollmentStatus === 'pending') {
-            // Pendente -> Botão desabilitado
-            btnHtml = `<button disabled class="btn-enroll" style="background-color: #f59e0b; cursor: default;"><i class='bx bx-time'></i> Aguardando Aprovação</button>`;
+            // Visitante
+            actionBtn = `<button onclick="location.href='login.html'" class="btn-card-action">Entrar</button>`;
+            cardLink = "login.html";
+        } else if (status === 'active') {
+            // Aluno
+            actionBtn = `<button onclick="location.href='classroom.html?id=${cls.id}'" class="btn-card-action" style="color:#10b981; background:#ecfdf5;">Acessar</button>`;
+            cardLink = `classroom.html?id=${cls.id}`;
+        } else if (status === 'pending') {
+            // Pendente
+            actionBtn = `<span class="text-warning small fw-bold"><i class='bx bx-time'></i> Aguardando</span>`;
         } else {
-            // Não matriculado -> Botão Inscrever
-            btnHtml = `<button onclick="enrollInClass('${cls.id}', ${cls.requires_approval})" class="btn-enroll"><i class='bx bx-user-plus'></i> Matricular-se</button>`;
+            // Disponível
+            actionBtn = `<button onclick="enrollInClass('${cls.id}', ${cls.requires_approval})" class="btn-card-action">Matricular</button>`;
         }
 
-        // Datas formatadas
         const startDate = cls.start_date ? new Date(cls.start_date).toLocaleDateString('pt-BR') : 'Imediato';
+        const cardClick = cardLink ? `onclick="location.href='${cardLink}'" style="cursor:pointer"` : '';
 
         const html = `
             <article class="course-card">
-                <div class="card-header-img">
-                    <i class='bx bx-book-reader'></i>
+                <div class="card-header-img" ${cardClick}>
+                    <i class='bx bx-book-open'></i>
+                    ${cls.requires_approval ? '<span class="card-status-badge">Requer Aprovação</span>' : ''}
                 </div>
                 <div class="card-body">
-                    <div class="badge-course">${courseTitle}</div>
-                    <h3 class="card-title">${cls.name}</h3>
+                    <div class="badge-course">${cls.name}</div>
+                    <h3 class="card-title" ${cardClick}>${courseTitle}</h3>
                     
                     <div class="card-meta">
-                        <div><i class='bx bx-calendar'></i> Início: ${startDate}</div>
-                        ${cls.max_students ? `<div><i class='bx bx-group'></i> Vagas limitadas</div>` : ''}
-                    </div>
-
-                    <div class="card-footer">
-                        ${btnHtml}
+                        <small class="text-muted"><i class='bx bx-calendar'></i> Início: ${startDate}</small>
+                        ${actionBtn}
                     </div>
                 </div>
             </article>
@@ -96,42 +93,31 @@ async function loadAvailableClasses(userId) {
     });
 }
 
-// Função Global de Matrícula
+// Matrícula
 window.enrollInClass = async (classId, requiresApproval) => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-        window.location.href = 'login.html';
-        return;
-    }
+    if (!session) { window.location.href = 'login.html'; return; }
 
     const status = requiresApproval ? 'pending' : 'active';
-    
-    // Mostra loading (simples)
     const btn = document.activeElement;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Processando...';
-    btn.disabled = true;
+    if(btn) { btn.innerHTML = '...'; btn.disabled = true; }
 
-    const { error } = await supabase
-        .from('class_enrollments')
-        .insert({
-            class_id: classId,
-            user_id: session.user.id,
-            status: status,
-            progress_percent: 0
-        });
+    const { error } = await supabase.from('class_enrollments').insert({
+        class_id: classId,
+        user_id: session.user.id,
+        status: status,
+        grades: { completed: [], scores: {} }
+    });
 
     if (error) {
-        alert("Erro ao realizar matrícula: " + error.message);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        alert("Erro: " + error.message);
+        if(btn) { btn.innerHTML = 'Erro'; btn.disabled = false; }
     } else {
         if (requiresApproval) {
-            alert("Solicitação enviada! Aguarde a aprovação do administrador.");
+            alert("Solicitação enviada!");
             window.location.reload();
         } else {
-            // Redireciona direto se for aprovação automática
-            window.location.href = `class-dashboard.html?id=${classId}`;
+            window.location.href = `classroom.html?id=${classId}`;
         }
     }
 };

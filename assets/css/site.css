@@ -17,114 +17,184 @@ body {
   overflow-x: hidden;
 }
 
-/* CONTAINER PRINCIPAL */
+/* CONTAINER (LARGURA TOTAL COM RESPIRO) */
 .container {
-  max-width: 1200px; /* Largura máxima confortável */
-  margin: 0 auto;
-  padding: 30px 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 40px 5%; /* 5% de margem lateral para não colar na borda */
   box-sizing: border-box;
-  width: 100%;
 }
 
-/* --- HERO SECTION (HOME) --- */
+/* --- HERO SECTION (LIMPA E ELEGANTE) --- */
 .hero {
   text-align: center;
-  padding: 50px 20px;
-  background: white;
-  border-radius: 16px;
-  margin-bottom: 40px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  padding: 60px 20px;
+  /* Gradiente Sutil */
+  background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);
+  border-radius: 24px;
+  margin-bottom: 50px;
+  border: 1px solid rgba(11, 87, 208, 0.1); /* Borda azul bem clarinha */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
 }
 
 .hero .badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background-color: #eff6ff; color: var(--primary);
-  padding: 6px 12px; border-radius: 50px;
-  font-weight: 700; font-size: 0.85rem; margin-bottom: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #e0e7ff; 
+  color: var(--primary);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
 }
 
 .hero h1 {
-  font-size: 2.2rem; font-weight: 800; color: #111;
-  margin: 0 0 10px 0; line-height: 1.2; letter-spacing: -0.5px;
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 15px 0;
+  line-height: 1.2;
+  letter-spacing: -1px;
 }
 
 .hero p {
-  font-size: 1.1rem; color: var(--text-muted);
-  max-width: 600px; margin: 0 auto 25px auto; line-height: 1.5;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-weight: 300;
 }
 
-/* BOTÕES HERO */
-.hero-actions { display: flex; gap: 10px; justify-content: center; }
-.btn-hero { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; border: 1px solid transparent; }
-.btn-primary-hero { background: var(--primary); color: white; }
-.btn-primary-hero:hover { background: #0056b3; }
-.btn-outline-hero { background: white; border-color: #ddd; color: #555; }
-.btn-outline-hero:hover { background: #f8f9fa; border-color: #ccc; }
-
-/* --- GRID DE CURSOS (HOME E APP) --- */
+/* --- LISTAGEM DE TURMAS --- */
 .section-header {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border);
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.section-title h2 { font-size: 1.5rem; margin: 0; color: #111; font-weight: 700; }
-.section-title p { margin: 5px 0 0 0; color: var(--text-muted); font-size: 0.9rem; }
+
+.section-title h2 { 
+    font-size: 1.8rem; 
+    margin: 0; 
+    font-weight: 700; 
+    color: #111; 
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
 .class-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  /* Grid responsivo: cresce para ocupar espaço */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
   width: 100%;
 }
 
-/* CARD DE CURSO */
+/* --- CARD DE CURSO (VISUAL "PREMIUM") --- */
 .course-card {
   background: white;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex; flex-direction: column;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
 
 .course-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.06);
-  border-color: var(--primary);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  border-color: rgba(11, 87, 208, 0.3);
 }
 
+/* Cabeçalho do Card (Imagem/Ícone) */
 .card-header-img {
   height: 140px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-  display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,0.15); font-size: 3.5rem;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* Navy */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.2);
+  font-size: 4rem;
+  position: relative;
 }
 
-.card-body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+/* Badge flutuante (opcional, para status) */
+.card-status-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255,255,255,0.9);
+    color: #111;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
 
+.card-body {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Nome da Turma (Pequeno) */
 .badge-course {
-  font-size: 0.7rem; text-transform: uppercase; font-weight: 800;
-  color: var(--primary); background: #eff6ff; padding: 4px 8px;
-  border-radius: 4px; align-self: flex-start; margin-bottom: 10px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
 }
 
-.card-title { font-size: 1.15rem; font-weight: 700; margin: 0 0 8px 0; color: #111; line-height: 1.3; }
-
-.card-meta { display: flex; flex-direction: column; gap: 6px; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; }
-.card-meta div { display: flex; align-items: center; gap: 6px; }
-
-.card-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid #f3f4f6; }
-
-.btn-enroll {
-  width: 100%; padding: 10px; border-radius: 8px; border: none;
-  background-color: var(--primary); color: white; font-weight: 600;
-  cursor: pointer; transition: background 0.2s; text-align: center;
-  display: inline-block; text-decoration: none;
+/* Nome do Curso (Grande) */
+.card-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin: 0 0 15px 0;
+  color: var(--primary); /* Azul */
+  line-height: 1.3;
 }
-.btn-enroll:hover { background-color: #1d4ed8; }
-.btn-enroll:disabled { background-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
 
-/* Barra de Progresso (Para Meus Cursos) */
-.progress-container { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; margin: 10px 0; overflow: hidden; }
-.progress-bar { height: 100%; background: #10b981; border-radius: 3px; width: 0%; transition: width 0.5s ease; }
+.card-meta {
+  margin-top: auto; /* Empurra para baixo */
+  padding-top: 20px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Botão no Card (Ação Principal) */
+.btn-card-action {
+    background: var(--bg-light);
+    color: var(--primary);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-card-action:hover {
+    background: #e0e7ff;
+    color: #004494;
+}
