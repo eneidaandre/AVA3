@@ -3,83 +3,48 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AVA • Home</title>
+    <title>AVA • Início</title>
 
-    <!-- (Necessário para os ícones bx aparecerem no header/sidebar e nos cards) -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-    />
-
-    <link rel="stylesheet" href="./assets/css/site.css" />
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"/>
     <link rel="stylesheet" href="./assets/css/chrome.css" />
+    <link rel="stylesheet" href="./assets/css/site.css" />
   </head>
 
-  <body data-page="home" class="has-sidebar">
+  <body class="has-sidebar">
     <div id="site-header"></div>
     <div id="site-sidebar"></div>
 
-    <!-- Adequação: manter um único <main> (evita conflito de layout) -->
     <main class="container">
+      
       <section class="hero">
         <div class="badge">
-          <i class="bx bx-shield-quarter"></i>
-          Ambiente Virtual de Aprendizagem
+          <i class="bx bxs-school"></i>
+          AVA 3.0
         </div>
-
-        <h1 style="margin-top: 12px">
-          Aprender, acompanhar e organizar — em um só lugar.
-        </h1>
-        <p>
-          Esta é a página pública do AVA (Index). Como adicionamos a classe
-          <strong>has-sidebar</strong> no body, o menu lateral aparece aqui para
-          teste.
-        </p>
-
+        <h1>Transforme seu aprendizado.</h1>
+        <p>Bem-vindo ao Ambiente Virtual de Aprendizagem. Escolha uma turma abaixo e comece agora.</p>
+        
         <div class="hero-actions">
-          <button id="cta-primary" class="btn primary">Entrar no AVA</button>
-          <button id="cta-secondary" class="btn">Ver o App (prévia)</button>
-
-          <span
-            id="home-note"
-            style="
-              display: block;
-              margin-top: 10px;
-              font-size: 13px;
-              color: var(--muted);
-              font-weight: 700;
-            "
-          >
-            Carregando status...
-          </span>
+            <a href="login.html" class="btn-hero btn-primary-hero">Acessar Conta</a>
+            <a href="#available-classes" class="btn-hero btn-outline-hero">Ver Turmas</a>
         </div>
       </section>
 
-      <section class="grid">
-        <article class="card span-4">
-          <div class="kpi">
-            <i class="bx bx-book-open"></i>
-            <strong>Cursos e Trilhas</strong>
-          </div>
-          <p>Um lugar para organizar módulos, aulas, materiais e atividades.</p>
-        </article>
+      <section id="available-classes">
+        <div class="section-header">
+            <div class="section-title">
+                <h2>Turmas Disponíveis</h2>
+                <p>Inscreva-se nos cursos abertos</p>
+            </div>
+        </div>
 
-        <article class="card span-4">
-          <div class="kpi">
-            <i class="bx bx-line-chart"></i>
-            <strong>Progresso e Controle</strong>
-          </div>
-          <p>Área do estudante, visão de andamento e histórico.</p>
-        </article>
-
-        <article class="card span-4">
-          <div class="kpi">
-            <i class="bx bx-lock-alt"></i>
-            <strong>Login e Segurança</strong>
-          </div>
-          <p>Acesso com autenticação. Admin visível apenas para staff.</p>
-        </article>
+        <div class="class-grid" id="classes-container">
+            <div style="text-align: center; grid-column: 1/-1; padding: 40px;">
+                <i class='bx bx-loader-alt bx-spin' style="font-size: 2rem; color: #ccc;"></i>
+            </div>
+        </div>
       </section>
+
     </main>
 
     <div id="site-footer"></div>

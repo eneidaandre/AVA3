@@ -1,20 +1,13 @@
 import { supabase } from './supabaseClient.js';
 
-/**
- * CONFIGURAÇÃO DE CAMINHOS
- * Verifique se o chrome.html está na pasta assets. 
- * Se estiver na mesma pasta que este JS, mude para './chrome.html'
- */
 const LAYOUT_URL = './assets/chrome.html';
 
 async function initChrome() {
-  // 1. Cria os slots necessários no HTML da página antes de injetar
   ensureSlot('site-header');
   ensureSlot('site-sidebar');
   ensureSlot('site-footer');
 
   try {
-    // 2. Busca o layout compartilhado
     const res = await fetch(LAYOUT_URL);
     if (!res.ok) throw new Error(`Não foi possível carregar o arquivo: ${LAYOUT_URL}`);
     
@@ -22,20 +15,18 @@ async function initChrome() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(text, 'text/html');
 
-    // 3. Injeta o conteúdo nos slots
     inject('site-header', doc, 'header');
     inject('site-sidebar', doc, 'sidebar');
     inject('site-footer', doc, 'footer');
 
-    // 4. Configura as interações de UI (Menu sanduíche)
     document.body.classList.add('has-sidebar');
+    
+    // === AQUI A CONFIGURAÇÃO DO BOTÃO ===
     setupSidebarToggle();
 
-    // 5. Autenticação e Níveis de Acesso
-    applyCachedRole(); // Mostra Admin instantaneamente se estiver no cache
-    await checkAuth(); // Valida a sessão real com o Supabase
+    applyCachedRole(); 
+    await checkAuth(); 
 
-    // 6. Monitoramento em tempo real
     supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT') {
             localStorage.removeItem('ava3_role');
@@ -47,15 +38,9 @@ async function initChrome() {
 
   } catch (err) {
     console.error('Erro ao inicializar interface (Chrome):', err);
-    // Fallback: se o fetch falhar, removemos travamentos visuais
-    const header = document.getElementById('site-header');
-    if (header) header.innerHTML = '<div style="padding:10px; color:red;">Erro ao carregar menu.</div>';
   }
 }
 
-/**
- * Gerencia a visibilidade de elementos baseado no papel do usuário salvo no navegador
- */
 function applyCachedRole() {
     const cachedRole = localStorage.getItem('ava3_role');
     const adminLink = document.getElementById('link-admin');
@@ -67,9 +52,6 @@ function applyCachedRole() {
     }
 }
 
-/**
- * Validação principal de login e permissões
- */
 async function checkAuth() {
   try {
     const nameEl = document.getElementById('user-name');
@@ -89,7 +71,6 @@ async function checkAuth() {
       return;
     }
 
-    // Usuário Logado
     if (authActions) authActions.style.display = 'none';
     if (userPillContainer) userPillContainer.style.display = 'flex';
 
@@ -102,7 +83,6 @@ async function checkAuth() {
       };
     }
 
-    // Busca perfil para definir Role
     const { data: rows } = await supabase
       .from('profiles')
       .select('name, role')
@@ -128,9 +108,6 @@ async function checkAuth() {
   }
 }
 
-/**
- * FUNÇÕES AUXILIARES DE INJEÇÃO
- */
 function ensureSlot(id) {
   if (!document.getElementById(id)) {
     const div = document.createElement('div');
@@ -151,14 +128,30 @@ function inject(id, doc, slotName) {
   }
 }
 
+// === CORREÇÃO DA LÓGICA DO MENU (PC vs CELULAR) ===
 function setupSidebarToggle() {
   const btn = document.getElementById('sidebar-toggle');
+  const overlay = document.getElementById('sidebar-overlay'); // Fundo escuro no mobile
+
   if (btn) {
-    btn.onclick = () => {
-      document.body.classList.toggle('sidebar-collapsed');
+    btn.onclick = (e) => {
+      e.stopPropagation(); // Impede clique duplo
+      
+      // Se a tela for menor que 900px (Celular/Tablet)
+      if (window.innerWidth <= 900) {
+        document.body.classList.toggle('sidebar-open'); // Abre o menu deslizando
+      } else {
+        document.body.classList.toggle('sidebar-collapsed'); // Encolhe o menu
+      }
+    };
+  }
+
+  // Fecha o menu ao clicar no fundo escuro (Mobile)
+  if (overlay) {
+    overlay.onclick = () => {
+      document.body.classList.remove('sidebar-open');
     };
   }
 }
 
-// Inicia o processo
 initChrome();

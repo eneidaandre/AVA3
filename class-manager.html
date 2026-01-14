@@ -8,6 +8,34 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/css/chrome.css">
     <link rel="stylesheet" href="./assets/css/admin.css">
+    <style>
+        /* CSS DO PREVIEW DO CERTIFICADO */
+        .cert-preview-container {
+            width: 100%;
+            aspect-ratio: 1.414 / 1; /* Proporção A4 Paisagem */
+            background-color: #f8f9fa;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .cert-preview-bg {
+            width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;
+        }
+        .cert-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; background: rgba(255,255,255,0.4);
+        }
+        .bg-option {
+            cursor: pointer; border: 3px solid transparent; width: 100%; height: 60px; object-fit: cover; border-radius: 6px; transition: 0.2s;
+        }
+        .bg-option:hover, .bg-option.active { border-color: #0d6efd; transform: scale(1.05); }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -112,7 +140,7 @@
                                         <div class="form-check form-switch mt-4">
                                             <input class="form-check-input" type="checkbox" id="requires_approval">
                                             <label class="form-check-label fw-bold">Requer Aprovação Manual</label>
-                                            <div class="form-text small">Se marcado, o aluno entra como "Pendente" e você precisa aprovar.</div>
+                                            <div class="form-text small">Se marcado, o aluno entra como "Pendente".</div>
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -136,6 +164,116 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalCertificate" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-white border-bottom">
+                    <h5 class="modal-title fw-bold text-primary"><i class='bx bx-certification'></i> Configurar Certificado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-light">
+                    <form id="formCertificate">
+                        <input type="hidden" id="cert_class_id">
+                        
+                        <ul class="nav nav-tabs mb-3" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#tab-cert-front" type="button">Frente (Layout)</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#tab-cert-back" type="button">Verso (Registro)</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-cert-front">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <div class="card p-3 h-100 border-0 shadow-sm">
+                                            <label class="form-label small fw-bold mb-2">Pré-visualização</label>
+                                            <div class="cert-preview-container">
+                                                <img id="cert-bg-preview" src="https://via.placeholder.com/800x600/e0e7ff/333?text=Selecione+um+Modelo" class="cert-preview-bg">
+                                                <div class="cert-overlay">
+                                                    <h3 class="fw-bold text-dark">NOME DO ALUNO</h3>
+                                                    <p class="mb-0">Concluiu com êxito o curso</p>
+                                                    <h5 class="text-primary fw-bold" id="preview-course-name">NOME DO CURSO</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card p-3 h-100 border-0 shadow-sm">
+                                            <label class="form-label small fw-bold">Modelo de Fundo</label>
+                                            <div class="d-grid gap-2 mb-3">
+                                                <img src="https://via.placeholder.com/300x200/fff/333?text=Clássico" class="bg-option" onclick="selectBg(this.src)">
+                                                <img src="https://via.placeholder.com/300x200/f0f9ff/007bff?text=Moderno+Azul" class="bg-option" onclick="selectBg(this.src)">
+                                                <img src="https://via.placeholder.com/300x200/fff3cd/856404?text=Dourado+Premium" class="bg-option" onclick="selectBg(this.src)">
+                                            </div>
+                                            <label class="form-label small fw-bold mt-2">Ou URL da Imagem</label>
+                                            <input type="url" id="cert_bg_url" class="form-control form-control-sm" placeholder="https://..." onchange="selectBg(this.value)">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card mt-3 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3 border-bottom pb-2">Assinaturas</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold">Assinatura 1 (Esquerda)</label>
+                                                <input type="text" id="signer1_name" class="form-control form-control-sm mb-1" placeholder="Nome Completo">
+                                                <input type="text" id="signer1_role" class="form-control form-control-sm" placeholder="Cargo">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold">Assinatura 2 (Direita)</label>
+                                                <input type="text" id="signer2_name" class="form-control form-control-sm mb-1" placeholder="Nome Completo">
+                                                <input type="text" id="signer2_role" class="form-control form-control-sm" placeholder="Cargo">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="tab-cert-back">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="alert alert-info d-flex align-items-center gap-2">
+                                            <i class='bx bx-info-circle fs-4'></i>
+                                            <div class="small">O verso do certificado conterá automaticamente a grade curricular, carga horária e notas do aluno.</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Formato do Registro</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white text-muted">REG-</span>
+                                                <input type="text" id="cert_reg_format" class="form-control" placeholder="2026-{SEQ}">
+                                            </div>
+                                            <div class="form-text">Use <code>{SEQ}</code> para o número sequencial e <code>{ANO}</code> para o ano atual.</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Texto Legal / Regulamentação</label>
+                                            <textarea id="cert_legal_text" class="form-control" rows="5" placeholder="Ex: Certificado emitido em conformidade com a Lei nº 9.394/96..."></textarea>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Fundo do Verso (URL)</label>
+                                            <input type="url" id="cert_back_bg_url" class="form-control form-control-sm" placeholder="https://...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-top-0 px-0 pb-0">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-success fw-bold px-4"><i class='bx bx-save'></i> Salvar Configurações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <template id="tpl-class-card">
         <div class="col-md-6 col-xl-4">
             <div class="card border-0 shadow-sm h-100 class-card">
@@ -146,8 +284,11 @@
                             <button class="btn btn-sm btn-light rounded-circle" data-bs-toggle="dropdown"><i class='bx bx-dots-vertical-rounded'></i></button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item btn-dashboard" href="#"><i class='bx bxs-dashboard me-2'></i> Painel da Turma</a></li>
-                                <li><a class="dropdown-item btn-edit" href="#"><i class='bx bx-edit me-2'></i> Editar Configurações</a></li>
+                                
+                                <li><a class="dropdown-item btn-cert" href="#"><i class='bx bx-certification me-2'></i> Configurar Certificado</a></li>
+                                
                                 <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item btn-edit" href="#"><i class='bx bx-edit me-2'></i> Editar Configurações</a></li>
                                 <li><a class="dropdown-item text-danger btn-delete" href="#"><i class='bx bx-trash me-2'></i> Excluir</a></li>
                             </ul>
                         </div>

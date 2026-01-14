@@ -1,220 +1,130 @@
-/* assets/css/chrome.css */
+/* ARQUIVO: assets/css/site.css */
 
 :root {
-  --header-h: 64px;
-  --sidebar-w: 260px;
-  --bg-color: #f8f9fa;
-  --line: #e2e8f0;
-  --brand: #0b57d0;
+  --primary: #0b57d0;
+  --bg-light: #f8f9fa;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
 }
 
-/* === 1. CORPO (Abre espaço) === */
 body {
   margin: 0;
-  background-color: var(--bg-color);
-  font-family: sans-serif;
-
-  /* Garante espaço para o topo e a lateral */
-  padding-top: var(--header-h) !important;
-  padding-left: var(--sidebar-w) !important; /* Espaço para sidebar */
-  transition: padding-left 0.3s ease;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  padding-bottom: 60px;
+  overflow-x: hidden;
 }
 
-/* Se não tiver a classe, remove o espaço lateral */
-body:not(.has-sidebar) {
-  padding-left: 0 !important;
-}
-
-/* === 2. CABEÇALHO (100% LARGURA - CORREÇÃO) === */
-.site-header {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important; /* Garante ponta a ponta */
-  height: var(--header-h) !important;
-
-  background: white;
-  border-bottom: 1px solid var(--line);
-  z-index: 9999 !important; /* Acima de tudo */
-
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
+/* CONTAINER PRINCIPAL */
+.container {
+  max-width: 1200px; /* Largura máxima confortável */
+  margin: 0 auto;
+  padding: 30px 20px;
   box-sizing: border-box;
-}
-
-.site-header .inner {
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
-/* === 3. MENU LATERAL (Abaixo do Header) === */
-.site-sidebar {
-  position: fixed !important;
-  top: var(--header-h) !important; /* Começa exatamente abaixo do header */
-  left: 0 !important;
-  bottom: 0 !important;
-  width: var(--sidebar-w) !important;
-
-  background: white;
-  border-right: 1px solid var(--line);
-  z-index: 9998 !important; /* Abaixo do header */
-
-  /* CORREÇÃO DO SUMIÇO: Força aparecer */
-  display: flex !important;
-  flex-direction: column;
-  transform: translateX(0) !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-
-  overflow-y: auto;
-}
-
-/* Esconde APENAS se o body disser que não tem sidebar */
-body:not(.has-sidebar) .site-sidebar {
-  display: none !important;
-}
-
-/* Estilos internos */
-.sidebar-inner {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.side-item {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  text-decoration: none;
-  color: #444;
-  border-radius: 8px;
-  font-size: 14px;
-  align-items: center;
-  cursor: pointer;
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-}
-.side-item:hover {
-  background: #eff6ff;
-  color: var(--brand);
-}
-.side-item i {
-  font-size: 18px;
-  color: #666;
-}
-.side-item:hover i {
-  color: var(--brand);
-}
-.side-title {
-  font-size: 11px;
-  font-weight: bold;
-  color: #999;
-  padding-left: 10px;
-  margin-top: 10px;
-}
-
-/* === 4. RODAPÉ === */
-.site-footer {
-  border-top: 1px solid var(--line);
-  background: white;
-  padding: 20px;
+/* --- HERO SECTION (HOME) --- */
+.hero {
   text-align: center;
-  font-size: 13px;
-  color: #666;
-  margin-top: 30px;
-  /* Reset de posição caso site.css interfira */
-  position: static !important;
-  width: 100% !important;
+  padding: 50px 20px;
+  background: white;
+  border-radius: 16px;
+  margin-bottom: 40px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
 
-/* === 5. MOBILE === */
-@media (max-width: 900px) {
-  body {
-    padding-left: 0 !important;
-  }
-  .nav-horizontal {
-    display: none !important;
-  }
-
-  /* No mobile, esconde por padrão */
-  .site-sidebar {
-    transform: translateX(-100%) !important;
-    top: var(--header-h) !important;
-    z-index: 10000 !important;
-  }
-
-  /* Se tiver a classe open, mostra */
-  body.sidebar-open .site-sidebar {
-    transform: translateX(0) !important;
-  }
-
-  .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9995;
-    display: none;
-  }
-  body.sidebar-open .sidebar-overlay {
-    display: block !important;
-  }
+.hero .badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background-color: #eff6ff; color: var(--primary);
+  padding: 6px 12px; border-radius: 50px;
+  font-weight: 700; font-size: 0.85rem; margin-bottom: 15px;
 }
 
-/* Elementos visuais */
-.left,
-.right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.hero h1 {
+  font-size: 2.2rem; font-weight: 800; color: #111;
+  margin: 0 0 10px 0; line-height: 1.2; letter-spacing: -0.5px;
 }
-.btn.icon {
-  background: none;
-  border: 1px solid #ddd;
-  padding: 5px;
-  border-radius: 4px;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
+
+.hero p {
+  font-size: 1.1rem; color: var(--text-muted);
+  max-width: 600px; margin: 0 auto 25px auto; line-height: 1.5;
 }
-.nav-horizontal {
-  display: flex;
-  gap: 20px;
+
+/* BOTÕES HERO */
+.hero-actions { display: flex; gap: 10px; justify-content: center; }
+.btn-hero { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; border: 1px solid transparent; }
+.btn-primary-hero { background: var(--primary); color: white; }
+.btn-primary-hero:hover { background: #0056b3; }
+.btn-outline-hero { background: white; border-color: #ddd; color: #555; }
+.btn-outline-hero:hover { background: #f8f9fa; border-color: #ccc; }
+
+/* --- GRID DE CURSOS (HOME E APP) --- */
+.section-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border);
 }
-.navlink {
-  text-decoration: none;
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
+.section-title h2 { font-size: 1.5rem; margin: 0; color: #111; font-weight: 700; }
+.section-title p { margin: 5px 0 0 0; color: var(--text-muted); font-size: 0.9rem; }
+
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  width: 100%;
 }
-.brand {
-  text-decoration: none;
-  color: #000;
-  font-weight: bold;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+
+/* CARD DE CURSO */
+.course-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex; flex-direction: column;
+  height: 100%;
 }
-.brand .dot {
-  width: 10px;
-  height: 10px;
-  background: var(--brand);
-  border-radius: 50%;
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+  border-color: var(--primary);
 }
-.btn-sm.primary {
-  background: var(--brand);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-size: 13px;
+
+.card-header-img {
+  height: 140px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.15); font-size: 3.5rem;
 }
+
+.card-body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+
+.badge-course {
+  font-size: 0.7rem; text-transform: uppercase; font-weight: 800;
+  color: var(--primary); background: #eff6ff; padding: 4px 8px;
+  border-radius: 4px; align-self: flex-start; margin-bottom: 10px;
+}
+
+.card-title { font-size: 1.15rem; font-weight: 700; margin: 0 0 8px 0; color: #111; line-height: 1.3; }
+
+.card-meta { display: flex; flex-direction: column; gap: 6px; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; }
+.card-meta div { display: flex; align-items: center; gap: 6px; }
+
+.card-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid #f3f4f6; }
+
+.btn-enroll {
+  width: 100%; padding: 10px; border-radius: 8px; border: none;
+  background-color: var(--primary); color: white; font-weight: 600;
+  cursor: pointer; transition: background 0.2s; text-align: center;
+  display: inline-block; text-decoration: none;
+}
+.btn-enroll:hover { background-color: #1d4ed8; }
+.btn-enroll:disabled { background-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+
+/* Barra de Progresso (Para Meus Cursos) */
+.progress-container { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+.progress-bar { height: 100%; background: #10b981; border-radius: 3px; width: 0%; transition: width 0.5s ease; }
