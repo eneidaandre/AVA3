@@ -2,116 +2,100 @@ import { supabase } from './supabaseClient.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    const userId = session?.user?.id;
-    loadAvailableClasses(userId);
-});
-
-async function loadAvailableClasses(userId) {
-    const container = document.getElementById('classes-container');
-    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><i class="bx bx-loader-alt bx-spin" style="font-size: 2rem; color: #0b57d0;"></i></div>';
-
-    const { data: classes, error } = await supabase
-        .from('classes')
-        .select(`
-            *,
-            courses (title, description),
-            class_enrollments (user_id, status)
-        `)
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error(error);
-        container.innerHTML = '<p style="text-align:center; color: red;">Erro ao carregar turmas.</p>';
-        return;
-    }
-
-    container.innerHTML = '';
-
-    if (!classes || classes.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color: #666; grid-column: 1/-1;">Nenhuma turma disponível no momento.</p>';
-        return;
-    }
-
-    classes.forEach(cls => {
-        const courseTitle = cls.courses?.title || 'Curso Geral';
-        
-        let enrollmentStatus = null;
-        if (userId && cls.class_enrollments) {
-            const enrollment = cls.class_enrollments.find(e => e.user_id === userId);
-            if (enrollment) enrollmentStatus = enrollment.status;
-        }
-
-        let btnHtml = '';
-        if (!userId) {
-            btnHtml = `<button onclick="window.location.href='login.html'" class="btn-enroll"><i class='bx bx-log-in'></i> Entrar para Inscrever-se</button>`;
-        } else if (enrollmentStatus === 'active') {
-            // LINK CORRIGIDO AQUI TAMBÉM
-            btnHtml = `<button onclick="window.location.href='classroom.html?id=${cls.id}'" class="btn-enroll" style="background-color: #10b981;"><i class='bx bx-play-circle'></i> Acessar Aula</button>`;
-        } else if (enrollmentStatus === 'pending') {
-            btnHtml = `<button disabled class="btn-enroll" style="background-color: #f59e0b; cursor: default;"><i class='bx bx-time'></i> Aguardando Aprovação</button>`;
-        } else {
-            btnHtml = `<button onclick="enrollInClass('${cls.id}', ${cls.requires_approval})" class="btn-enroll"><i class='bx bx-user-plus'></i> Matricular-se</button>`;
-        }
-
-        const startDate = cls.start_date ? new Date(cls.start_date).toLocaleDateString('pt-BR') : 'Imediato';
-
-        const html = `
-            <article class="course-card">
-                <div class="card-header-img">
-                    <i class='bx bx-book-reader'></i>
-                </div>
-                <div class="card-body">
-                    <div class="badge-course">${courseTitle}</div>
-                    <h3 class="card-title">${cls.name}</h3>
-                    
-                    <div class="card-meta">
-                        <div><i class='bx bx-calendar'></i> Início: ${startDate}</div>
-                        ${cls.max_students ? `<div><i class='bx bx-group'></i> Vagas limitadas</div>` : ''}
-                    </div>
-
-                    <div class="card-footer">
-                        ${btnHtml}
-                    </div>
-                </div>
-            </article>
-        `;
-        
-        container.insertAdjacentHTML('beforeend', html);
-    });
-}
-
-window.enrollInClass = async (classId, requiresApproval) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    
+    // Se não estiver logado, manda para o login
     if (!session) {
         window.location.href = 'login.html';
         return;
     }
 
-    const status = requiresApproval ? 'pending' : 'active';
-    const btn = document.activeElement;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Processando...';
-    btn.disabled = true;
+    loadMyCourses(session.user.id);
+});
 
-    const { error } = await supabase
+async function loadMyCourses(userId) {
+    const container = document.getElementById('my-courses-list');
+    
+    // Loader
+    container.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+            <i class="bx bx-loader-alt bx-spin" style="font-size: 2rem; color: #ccc;"></i>
+        </div>`;
+
+    // Busca as matrículas do usuário
+    // Trazendo dados da Turma (classes) e do Curso (courses) associados
+    const { data: enrollments, error } = await supabase
         .from('class_enrollments')
-        .insert({
-            class_id: classId,
-            user_id: session.user.id,
-            status: status,
-            progress_percent: 0
-        });
+        .select(`
+            *,
+            classes (
+                id, 
+                name,
+                courses (title, description)
+            )
+        `)
+        .eq('user_id', userId)
+        .eq('status', 'active'); // Apenas matrículas ativas
 
     if (error) {
-        alert("Erro: " + error.message);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    } else {
-        if (requiresApproval) {
-            alert("Solicitação enviada! Aguarde a aprovação.");
-            window.location.reload();
-        } else {
-            window.location.href = `classroom.html?id=${classId}`;
-        }
+        console.error("Erro ao carregar cursos:", error);
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align:center;">Erro ao carregar seus cursos.</div>';
+        return;
     }
-};
+
+    container.innerHTML = '';
+
+    if (!enrollments || enrollments.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px; background: white; border-radius: 12px; border: 1px dashed #ccc;">
+                <h3>Você ainda não tem cursos.</h3>
+                <p class="text-muted">Explore as turmas disponíveis e comece a aprender.</p>
+                <a href="index.html" class="btn-enroll" style="width: auto; padding: 10px 30px; display:inline-block; margin-top:10px;">
+                    Ver Turmas Disponíveis
+                </a>
+            </div>`;
+        return;
+    }
+
+    enrollments.forEach(enroll => {
+        const cls = enroll.classes;
+        const course = cls.courses;
+        
+        // Lógica de Progresso (Baseado na contagem de IDs concluídos no JSON)
+        const completedCount = enroll.grades?.completed?.length || 0;
+        // Aqui assumimos um valor visual fixo de progresso (no backend idealmente calculamos o total de aulas)
+        // Como o total de aulas não vem fácil nessa query, usaremos o % salvo no banco se existir, ou um cálculo visual
+        const progressPercent = enroll.progress_percent || 0;
+
+        const html = `
+            <article class="course-card">
+                <div class="card-header-img">
+                    <i class='bx bx-book-bookmark'></i>
+                </div>
+                <div class="card-body">
+                    <div class="badge-course">${cls.name}</div>
+                    <h3 class="card-title">${course?.title || 'Curso Sem Título'}</h3>
+                    
+                    <div class="card-meta">
+                        <div class="progress-info" style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
+                            <span class="text-muted">Progresso</span>
+                            <span class="text-bold text-primary">${progressPercent}%</span>
+                        </div>
+                        <div class="progress-container" style="background: #e2e8f0; height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div class="progress-bar" style="width: ${progressPercent}%; background: #10b981; height: 100%;"></div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
+                            <i class='bx bx-check-circle'></i> ${completedCount} lições concluídas
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <a href="classroom.html?id=${cls.id}" class="btn-enroll" style="text-align: center; display: block; text-decoration: none;">
+                            <i class='bx bx-play'></i> Continuar Estudando
+                        </a>
+                    </div>
+                </div>
+            </article>`;
+        
+        container.insertAdjacentHTML('beforeend', html);
+    });
+}

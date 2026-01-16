@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVA3 • Meu Perfil</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/css/chrome.css">
+    <link rel="stylesheet" href="./assets/css/profile.css"> </head>
+
+<body class="bg-light">
+
+    <div id="site-header"></div>
+    <div id="site-sidebar"></div>
+
+    <main class="page-content">
+        <div class="container-fluid p-4">
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden profile-header-card">
+                <div class="card-body p-4 d-flex flex-column flex-md-row align-items-center gap-4">
+                    <div class="position-relative">
+                        <div class="profile-avatar-xl rounded-circle d-flex align-items-center justify-content-center bg-primary text-white fw-bold fs-1">
+                            <span id="header-avatar-initials">--</span>
+                        </div>
+                        <button class="btn btn-sm btn-light border position-absolute bottom-0 end-0 rounded-circle shadow-sm" style="width: 32px; height: 32px;" title="Alterar Foto (Em breve)">
+                            <i class='bx bx-camera'></i>
+                        </button>
+                    </div>
+                    <div class="text-center text-md-start flex-grow-1">
+                        <h2 class="fw-bold mb-1" id="header-name">Carregando...</h2>
+                        <p class="text-muted mb-2" id="header-role">Estudante</p>
+                        <div class="d-flex gap-2 justify-content-center justify-content-md-start">
+                            <span class="badge bg-light text-dark border"><i class='bx bx-envelope'></i> <span id="header-email">...</span></span>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class='bx bx-check-shield'></i> Conta Ativa</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm" onclick="generatePDF()">
+                            <i class='bx bxs-file-pdf me-2'></i> Baixar Currículo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-3">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="list-group list-group-flush rounded-4 overflow-hidden">
+                            <a href="#tab-personal" data-bs-toggle="list" class="list-group-item list-group-item-action active py-3 fw-bold">
+                                <i class='bx bx-user me-2'></i> Dados Pessoais
+                            </a>
+                            <a href="#tab-cv" data-bs-toggle="list" class="list-group-item list-group-item-action py-3 fw-bold">
+                                <i class='bx bx-file me-2'></i> Meu Currículo
+                            </a>
+                            <a href="#tab-certificates" data-bs-toggle="list" class="list-group-item list-group-item-action py-3 fw-bold">
+                                <i class='bx bx-certification me-2'></i> Meus Certificados
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-danger" onclick="logout()">
+                                <i class='bx bx-log-out me-2'></i> Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-9">
+                    <div class="tab-content">
+                        
+                        <div class="tab-pane fade show active" id="tab-personal">
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-header bg-white py-3 border-bottom"><h5 class="fw-bold mb-0">Informações Básicas</h5></div>
+                                <div class="card-body p-4">
+                                    <form id="formProfile">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold small">Nome Completo</label>
+                                                <input type="text" id="prof_name" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold small">E-mail (Login)</label>
+                                                <input type="text" id="prof_email" class="form-control bg-light" disabled readonly>
+                                            </div>
+                                            <div class="col-12 text-end mt-4">
+                                                <button type="submit" class="btn btn-primary fw-bold px-4">Salvar Alterações</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-cv">
+                            <form id="formCV">
+                                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                    <div class="card-header bg-white py-3 border-bottom"><h5 class="fw-bold mb-0">Resumo Profissional</h5></div>
+                                    <div class="card-body p-4">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold small">Título Profissional</label>
+                                                <input type="text" id="cv_title" class="form-control" placeholder="Ex: Desenvolvedor Front-end Júnior">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold small">Resumo / Bio</label>
+                                                <textarea id="cv_bio" class="form-control" rows="4" placeholder="Fale um pouco sobre seus objetivos e experiências..."></textarea>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold small">Telefone / WhatsApp</label>
+                                                <input type="text" id="cv_phone" class="form-control" placeholder="(xx) 9xxxx-xxxx">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold small">LinkedIn (URL)</label>
+                                                <input type="url" id="cv_linkedin" class="form-control" placeholder="https://linkedin.com/in/...">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold small">Portfólio (URL)</label>
+                                                <input type="url" id="cv_portfolio" class="form-control" placeholder="https://...">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold small">Habilidades (Separadas por vírgula)</label>
+                                                <input type="text" id="cv_skills" class="form-control" placeholder="Ex: HTML, CSS, Liderança, Vendas...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                                        <h5 class="fw-bold mb-0">Experiência Profissional</h5>
+                                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="addExperienceField()">
+                                            <i class='bx bx-plus'></i> Adicionar
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div id="experience-list" class="d-flex flex-column gap-3">
+                                            </div>
+                                    </div>
+                                </div>
+
+                                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                                        <h5 class="fw-bold mb-0">Formação Acadêmica (Externa)</h5>
+                                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="addEducationField()">
+                                            <i class='bx bx-plus'></i> Adicionar
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="alert alert-info small mb-3">
+                                            <i class='bx bx-info-circle'></i> Seus cursos concluídos na plataforma <b>AVA3</b> serão adicionados automaticamente ao final do currículo.
+                                        </div>
+                                        <div id="education-list" class="d-flex flex-column gap-3">
+                                            </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end mb-5">
+                                    <button type="submit" class="btn btn-success fw-bold px-5 py-2 rounded-pill shadow">
+                                        <i class='bx bx-save'></i> Salvar Currículo
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-certificates">
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-header bg-white py-3 border-bottom"><h5 class="fw-bold mb-0">Meus Certificados</h5></div>
+                                <div class="card-body p-4">
+                                    <div id="certificates-grid" class="row g-3">
+                                        <div class="col-12 text-center py-5">
+                                            <div class="spinner-border text-primary"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="cv-print-area">
+        <div class="cv-paper">
+            <header class="cv-header">
+                <h1 id="print-name">Nome do Usuário</h1>
+                <h3 id="print-title">Título Profissional</h3>
+                <div class="cv-contact" id="print-contact">
+                    </div>
+            </header>
+            
+            <section class="cv-section" id="print-summary-sec">
+                <h4>Resumo</h4>
+                <p id="print-summary"></p>
+            </section>
+
+            <section class="cv-section" id="print-skills-sec">
+                <h4>Habilidades</h4>
+                <div id="print-skills" class="skills-list"></div>
+            </section>
+
+            <section class="cv-section">
+                <h4>Experiência Profissional</h4>
+                <div id="print-experience"></div>
+            </section>
+
+            <section class="cv-section">
+                <h4>Formação Acadêmica & Certificações</h4>
+                <div id="print-education"></div>
+                
+                <div id="print-ava3-certs" class="mt-3">
+                    <h5 class="text-primary mb-2" style="font-size: 0.9rem; text-transform: uppercase;">Cursos AVA3 Concluídos</h5>
+                    <ul id="ava3-certs-list" class="simple-list"></ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <template id="tpl-experience-item">
+        <div class="p-3 bg-light rounded border position-relative experience-item">
+            <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.experience-item').remove()"><i class='bx bx-trash'></i></button>
+            <div class="row g-2">
+                <div class="col-md-6"><input type="text" class="form-control form-control-sm exp-company" placeholder="Empresa"></div>
+                <div class="col-md-6"><input type="text" class="form-control form-control-sm exp-role" placeholder="Cargo"></div>
+                <div class="col-md-6"><input type="text" class="form-control form-control-sm exp-period" placeholder="Período (Ex: 2020 - 2022)"></div>
+                <div class="col-12"><textarea class="form-control form-control-sm exp-desc" rows="2" placeholder="Descrição das atividades..."></textarea></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tpl-education-item">
+        <div class="p-3 bg-light rounded border position-relative education-item">
+            <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.education-item').remove()"><i class='bx bx-trash'></i></button>
+            <div class="row g-2">
+                <div class="col-md-6"><input type="text" class="form-control form-control-sm edu-school" placeholder="Instituição"></div>
+                <div class="col-md-6"><input type="text" class="form-control form-control-sm edu-degree" placeholder="Curso / Grau"></div>
+                <div class="col-md-4"><input type="text" class="form-control form-control-sm edu-year" placeholder="Ano Conclusão"></div>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./assets/js/chrome.js"></script>
+    <script type="module" src="./assets/js/profile.js"></script>
+</body>
+</html>

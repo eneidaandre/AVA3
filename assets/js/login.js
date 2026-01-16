@@ -5,7 +5,7 @@ const $ = (id) => document.getElementById(id);
 // --- LOGIN ---
 $('form-login')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    showMsg(); // Limpa msg
+    showMsg(); 
 
     const email = $('login-email').value.trim();
     const password = $('login-pass').value;
@@ -36,23 +36,41 @@ $('form-signup')?.addEventListener('submit', async (e) => {
     const password = $('signup-pass').value;
     const btn = $('btn-signup-submit');
 
+    if (name.length < 3) return showMsg('error', 'Digite seu nome completo.');
+
     btn.disabled = true;
     btn.innerText = 'Criando conta...';
 
     const redirectTo = new URL('index.html', window.location.href).toString();
 
-    const { error } = await supabase.auth.signUp({
+    // 1. Cria a conta
+    const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name }, emailRedirectTo: redirectTo }
+        options: { 
+            data: { full_name: name }, // Envia meta-dados
+            emailRedirectTo: redirectTo 
+        }
     });
+
+    if (error) {
+        btn.disabled = false;
+        btn.innerText = 'Cadastrar';
+        return showMsg('error', error.message);
+    }
+
+    // 2. Correção de Nome (Fallback): Se entrou direto, força o update no profile
+    if (data?.session && data?.user) {
+        // Se o banco salvou o email no nome, isso corrige agora mesmo
+        await supabase.from('profiles').update({ name: name }).eq('id', data.user.id);
+        
+        window.location.assign('./app.html');
+        return;
+    }
 
     btn.disabled = false;
     btn.innerText = 'Cadastrar';
-
-    if (error) return showMsg('error', error.message);
-
-    showMsg('success', 'Cadastro feito! Verifique seu e-mail (e SPAM) para confirmar.');
+    showMsg('success', '✅ Conta criada! Verifique seu e-mail (inclusive SPAM) para confirmar o acesso.');
     e.target.reset();
 });
 
@@ -74,7 +92,7 @@ $('form-forgot')?.addEventListener('submit', async (e) => {
     else showMsg('success', 'Link enviado para o e-mail.');
 });
 
-// Helper de Mensagem
+// Helper
 function showMsg(type, text) {
     const el = $('msg');
     if (!type) {

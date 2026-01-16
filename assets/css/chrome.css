@@ -30,10 +30,16 @@ body {
 
 /* === HEADER === */
 .site-header {
-  position: fixed !important; top: 0; left: 0; right: 0; height: var(--header-h) !important;
-  background: white; border-bottom: 1px solid var(--line); z-index: 2000;
+  position: fixed !important; 
+  top: 0; left: 0; right: 0; height: var(--header-h) !important;
+  background: white; border-bottom: 1px solid var(--line); 
+  
+  /* CORREÇÃO AQUI: */
+  /* Baixamos de 2000 para 1020 para ficar ABAIXO do Modal do Bootstrap (que é 1055) */
+  z-index: 1020; 
+  
   display: flex; align-items: center; padding: 0 20px; width: 100% !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.03); /* Sombra sutil no header */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
 .site-header .inner { width: 100%; display: flex; align-items: center; justify-content: space-between; }
@@ -56,7 +62,7 @@ body {
 .navlink { text-decoration: none; color: #64748b; font-size: 14px; font-weight: 600; transition: color 0.2s; }
 .navlink:hover, .navlink.active { color: var(--brand); }
 
-/* === LADO DIREITO (PERFIL DO USUÁRIO - CORRIGIDO) === */
+/* === LADO DIREITO (PERFIL DO USUÁRIO) === */
 .right { 
     margin-left: auto !important; 
     display: flex !important; 
@@ -64,15 +70,14 @@ body {
     gap: 15px; 
 }
 
-/* Estilo "Cápsula" para o usuário */
 .user-pill {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #f8fafc; /* Fundo cinza bem claro */
+  background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 50px; /* Borda redonda */
-  padding: 5px 16px 5px 6px; /* Espaçamento interno */
+  border-radius: 50px;
+  padding: 5px 16px 5px 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   max-width: 250px;
@@ -84,11 +89,10 @@ body {
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* Círculo do Ícone/Avatar */
 .avatar-circle {
   width: 32px;
   height: 32px;
-  background-color: var(--brand); /* Fundo Azul */
+  background-color: var(--brand);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -98,7 +102,6 @@ body {
   font-weight: 600;
 }
 
-/* Nome do Usuário */
 #user-name {
   font-size: 0.9rem;
   font-weight: 600;
@@ -108,7 +111,6 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Ações de Auth (Botão Entrar quando deslogado) */
 .btn-sm.primary {
   background: var(--brand); color: white; padding: 8px 20px;
   border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;
@@ -116,7 +118,7 @@ body {
 }
 .btn-sm.primary:hover { background: #0842a0; }
 
-/* === SIDEBAR (MANTIDO) === */
+/* === SIDEBAR === */
 .site-sidebar {
   position: fixed !important; top: var(--header-h) !important; left: 0 !important; bottom: 0 !important;
   width: var(--sidebar-w) !important;
@@ -154,7 +156,6 @@ body.sidebar-collapsed .side-item i { margin: 0 !important; }
   .sidebar-overlay { position: fixed; top: var(--header-h); left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 900; display: none; }
   body.sidebar-open .sidebar-overlay { display: block; }
   
-  /* Esconde nome no celular para economizar espaço, deixa só o avatar */
   .user-pill { padding: 0; border: none; background: transparent; }
   #user-name { display: none; }
 }

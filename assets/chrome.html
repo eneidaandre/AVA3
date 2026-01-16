@@ -5,21 +5,15 @@
         <button id="sidebar-toggle" class="btn icon">
           <i class="bx bx-menu"></i>
         </button>
-        <a class="brand" href="./index.html"
-          ><span class="dot"></span><span>AVA3</span></a
-        >
+        <a class="brand" href="./index.html">
+          <span class="dot"></span><span>AVA3</span>
+        </a>
       </div>
 
       <nav class="nav-horizontal">
         <a class="navlink" href="./index.html">Início</a>
         <a class="navlink" href="./app.html">Meus Cursos</a>
-        <a
-          class="navlink"
-          href="./admin.html"
-          id="link-admin"
-          style="display: none"
-          >Admin</a
-        >
+        <a class="navlink" href="./admin.html" id="link-admin" style="display: none">Admin</a>
       </nav>
 
       <div class="right">
@@ -38,44 +32,63 @@
 <div data-slot="sidebar">
   <aside class="site-sidebar">
     <div class="sidebar-inner">
+      
       <div class="side-group">
         <p class="side-title">NAVEGAÇÃO</p>
+        
+        <a class="side-item" href="./index.html">
+          <i class='bx bx-home-alt'></i><span class="label-text">Início</span>
+        </a>
         
         <a class="side-item" href="./app.html">
           <i class="bx bx-book-bookmark"></i><span class="label-text">Meus Cursos</span>
         </a>
         
-        <a class="side-item" href="#">
-          <i class="bx bx-calendar"></i
-          ><span class="label-text">Calendário</span>
+        <a class="side-item" href="./calendar.html">
+          <i class="bx bx-calendar"></i><span class="label-text">Calendário</span>
+        </a>
+      </div>
+
+      <div class="side-group">
+        <p class="side-title">INSTITUCIONAL</p>
+        
+        <a class="side-item" href="./profile.html">
+          <i class='bx bx-user-circle'></i><span class="label-text">Meu Perfil</span>
+        </a>
+
+        <a class="side-item" href="./contact.html">
+          <i class='bx bx-envelope'></i><span class="label-text">Fale Conosco</span>
+        </a>
+
+        <a class="side-item" href="./about.html">
+          <i class='bx bx-info-circle'></i><span class="label-text">Sobre Nós</span>
         </a>
       </div>
 
       <div class="side-group" id="sidebar-admin-group" style="display: none">
         <p class="side-title">GESTÃO</p>
         <a class="side-item" href="./admin.html">
-          <i class="bx bx-cog"></i><span class="label-text">Admin</span>
+          <i class="bx bx-cog"></i><span class="label-text">Painel Admin</span>
+        </a>
+        <a class="side-item" href="./class-manager.html">
+            <i class='bx bx-chalkboard'></i><span class="label-text">Gestão Turmas</span>
         </a>
       </div>
 
       <div style="flex: 1"></div>
 
       <div class="side-group">
-        <button
-          id="side-logout"
-          class="side-item danger"
-          style="display: none; color: #d32f2f"
-        >
+        <button id="side-logout" class="side-item danger" style="display: none; color: #d32f2f;">
           <i class="bx bx-log-out"></i><span class="label-text">Sair</span>
         </button>
       </div>
+
     </div>
   </aside>
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
 </div>
 
 <div data-slot="footer">
   <footer class="site-footer">
-    <div class="inner">&copy; 2026 AVA3.</div>
+    &copy; 2026 AVA3 Plataforma de Ensino. Todos os direitos reservados.
   </footer>
 </div>

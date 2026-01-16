@@ -1,0 +1,81 @@
+/* ARQUIVO: assets/css/profile.css */
+
+.profile-avatar-xl {
+    width: 80px; height: 80px; font-size: 2rem;
+}
+
+/* --- ESTILOS DE IMPRESSÃO (O SEGREDO DO PDF) --- */
+#cv-print-area {
+    display: none; /* Escondido por padrão na tela */
+}
+
+@media print {
+    /* Esconde toda a interface do site */
+    #site-header, #site-sidebar, .page-content {
+        display: none !important;
+    }
+
+    /* Mostra apenas a área do CV */
+    #cv-print-area {
+        display: block;
+        background: white;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0; left: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background: white;
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        color: #333;
+    }
+
+    /* Layout do Papel A4 */
+    .cv-paper {
+        max-width: 210mm; /* Largura A4 */
+        margin: 0 auto;
+        padding: 10mm 15mm;
+    }
+
+    /* Tipografia do CV */
+    .cv-header {
+        border-bottom: 2px solid #333;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    .cv-header h1 { margin: 0; font-size: 24pt; text-transform: uppercase; letter-spacing: 1px; }
+    .cv-header h3 { margin: 5px 0 10px; font-size: 14pt; color: #555; font-weight: normal; }
+    .cv-contact { font-size: 10pt; color: #666; display: flex; gap: 15px; flex-wrap: wrap; }
+    
+    .cv-section { margin-bottom: 25px; }
+    .cv-section h4 { 
+        font-size: 12pt; text-transform: uppercase; border-bottom: 1px solid #ccc; 
+        padding-bottom: 5px; margin-bottom: 10px; color: #000; 
+    }
+    .cv-section p { font-size: 10pt; line-height: 1.5; margin: 0; }
+
+    .cv-item { margin-bottom: 12px; }
+    .cv-item-title { font-weight: bold; font-size: 11pt; }
+    .cv-item-subtitle { font-style: italic; font-size: 10pt; color: #444; }
+    .cv-item-desc { font-size: 10pt; margin-top: 4px; }
+
+    .skills-list span { 
+        display: inline-block; background: #eee; padding: 2px 8px; 
+        border-radius: 4px; font-size: 9pt; margin-right: 5px; margin-bottom: 5px; 
+        border: 1px solid #ddd;
+    }
+    
+    .simple-list { list-style: none; padding: 0; margin: 0; }
+    .simple-list li { 
+        padding: 4px 0; border-bottom: 1px dotted #eee; font-size: 10pt;
+        display: flex; justify-content: space-between;
+    }
+
+    /* Remove links azuis na impressão */
+    a { text-decoration: none; color: #333; }
+}

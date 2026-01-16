@@ -8,29 +8,6 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/css/chrome.css">
     <link rel="stylesheet" href="./assets/css/admin.css">
-    <style>
-        .cert-preview-container {
-            width: 100%;
-            aspect-ratio: 1.414 / 1;
-            background-color: #f8f9fa;
-            border: 1px dashed #cbd5e1;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-        .cert-preview-bg { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
-        .cert-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; background: rgba(255,255,255,0.4);
-        }
-        .bg-option { cursor: pointer; border: 3px solid transparent; width: 100%; height: 60px; object-fit: cover; border-radius: 6px; transition: 0.2s; }
-        .bg-option:hover, .bg-option.active { border-color: #4f46e5; transform: scale(1.05); }
-    </style>
 </head>
 <body class="bg-light">
 
@@ -59,10 +36,10 @@
     </main>
 
     <div class="modal fade" id="modalClass" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-white border-bottom">
-                    <h5 class="modal-title fw-bold">Configurar Turma</h5>
+                    <h5 class="modal-title fw-bold">Nova Turma</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body bg-light">
@@ -71,31 +48,33 @@
                         
                         <div class="card border-0 shadow-sm mb-3">
                             <div class="card-body">
-                                <h6 class="fw-bold border-bottom pb-2 mb-3">1. Curso Base</h6>
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">1. Curso Base (Busca por Código)</h6>
                                 <select id="course_select" class="form-select" required>
-                                    <option value="">Carregando cursos...</option>
+                                    <option value="">Carregando lista...</option>
                                 </select>
+                                <div class="form-text">Selecione o código (#ID) do curso desejado.</div>
                             </div>
                         </div>
 
                         <div class="card border-0 shadow-sm mb-3">
                             <div class="card-body">
-                                <h6 class="fw-bold border-bottom pb-2 mb-3">2. Identificação e Datas da Turma</h6>
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">2. Identificação</h6>
                                 <div class="row g-3">
                                     <div class="col-md-8">
                                         <label class="form-label small fw-bold">Nome da Turma *</label>
-                                        <input type="text" id="class_name" class="form-control" required>
+                                        <input type="text" id="class_name" class="form-control" required placeholder="Ex: Turma 2026 - Matutino">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Código</label>
-                                        <input type="text" id="class_code" class="form-control">
+                                        <label class="form-label small fw-bold">Código da Turma</label>
+                                        <input type="text" id="class_code" class="form-control" placeholder="Ex: T26-A (Único)">
+                                        <small class="text-muted" style="font-size: 0.7rem;">* Não poderá ser alterado depois.</small>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Data de Início das Aulas</label>
+                                        <label class="form-label small fw-bold">Início das Aulas</label>
                                         <input type="date" id="start_date" class="form-control">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Data de Término</label>
+                                        <label class="form-label small fw-bold">Término</label>
                                         <input type="date" id="end_date" class="form-control">
                                     </div>
                                 </div>
@@ -104,47 +83,39 @@
 
                         <div class="card border-0 shadow-sm mb-3">
                             <div class="card-body">
-                                <h6 class="fw-bold border-bottom pb-2 mb-3">3. Regras de Matrícula</h6>
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">3. Regras e Inscrição</h6>
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Limite de Alunos</label>
+                                        <label class="form-label small fw-bold">Vagas</label>
                                         <input type="number" id="max_students" class="form-control" placeholder="Ilimitado">
                                     </div>
-                                    <div class="col-md-8">
-                                        <div class="form-check form-switch mt-4">
+                                    <div class="col-md-8 pt-4">
+                                        <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="requires_approval">
                                             <label class="form-check-label fw-bold">Requer Aprovação Manual</label>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card border-0 shadow-sm mb-3">
-                            <div class="card-body">
-                                <h6 class="fw-bold border-bottom pb-2 mb-3">4. Período de Inscrição</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" id="enrollment_open" checked>
-                                            <label class="form-check-label fw-bold">Inscrições Abertas</label>
-                                        </div>
-                                    </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Início das Inscrições</label>
+                                        <label class="form-label small fw-bold">Início Inscrições</label>
                                         <input type="date" id="enrollment_start" class="form-control">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Fim das Inscrições</label>
+                                        <label class="form-label small fw-bold">Fim Inscrições</label>
                                         <input type="date" id="enrollment_deadline" class="form-control">
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="enrollment_open" checked>
+                                            <label class="form-check-label fw-bold">Inscrições Abertas Agora</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="text-end mt-4">
+                        <div class="modal-footer border-top-0 px-0 pb-0">
                             <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary px-4 fw-bold">Salvar Turma</button>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">Criar Turma</button>
                         </div>
                     </form>
                 </div>
@@ -152,43 +123,37 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalCertificate" tabindex="-1" aria-hidden="true">
-        </div>
-
     <template id="tpl-class-card">
         <div class="col-md-6 col-xl-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="badge bg-primary bg-opacity-10 text-primary class-course-name">Curso Base</span>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-light" data-bs-toggle="dropdown"><i class='bx bx-dots-vertical-rounded'></i></button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item btn-dashboard" href="#"><i class='bx bxs-dashboard me-2'></i> Painel</a></li>
-                                <li><a class="dropdown-item btn-cert" href="#"><i class='bx bx-certification me-2'></i> Certificado</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item btn-edit" href="#"><i class='bx bx-edit me-2'></i> Editar</a></li>
-                                <li><a class="dropdown-item text-danger btn-delete" href="#"><i class='bx bx-trash me-2'></i> Excluir</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <h5 class="card-title fw-bold class-name">Nome da Turma</h5>
-                    <div class="mt-2 mb-3">
-                        <span class="badge class-status-badge">Verificando...</span>
+            <div class="card border-0 shadow-sm h-100 card-hover-effect">
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary class-course-name text-uppercase fw-bold" style="font-size: 0.75rem;">Curso Base</span>
                     </div>
                     
-                    <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded mb-3">
-                        <div class="text-center w-50 border-end">
-                            <strong class="d-block class-count">0</strong>
-                            <small class="text-muted" style="font-size: 0.65rem;">ALUNOS</small>
-                        </div>
-                        <div class="text-center w-50">
-                            <strong class="d-block class-deadline-info">--/--</strong>
-                            <small class="text-muted" style="font-size: 0.65rem;">PRAZO INSCRIÇÃO</small>
-                        </div>
+                    <h4 class="card-title fw-bold class-name text-dark mb-1">Nome da Turma</h4>
+                    
+                    <div class="mb-3 d-flex align-items-center gap-2">
+                         <span class="badge bg-light text-dark border class-code-badge">COD: --</span>
+                         <span class="badge class-status-badge">Status</span>
                     </div>
+                    
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded mb-3 border">
+                            <div class="text-center w-50 border-end">
+                                <h5 class="mb-0 fw-bold class-count">0</h5>
+                                <small class="text-muted text-uppercase" style="font-size: 0.65rem;">Alunos</small>
+                            </div>
+                            <div class="text-center w-50">
+                                <h5 class="mb-0 fw-bold class-deadline-info">--/--</h5>
+                                <small class="text-muted text-uppercase" style="font-size: 0.65rem;">Fim Inscrição</small>
+                            </div>
+                        </div>
 
-                    <button class="btn btn-primary w-100 btn-dashboard fw-bold">Gerenciar</button>
+                        <button class="btn btn-primary w-100 btn-dashboard fw-bold py-2 shadow-sm">
+                            <i class='bx bxs-dashboard me-1'></i> GERENCIAR
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

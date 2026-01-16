@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVA3 • Fale Conosco</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/css/chrome.css">
+    <link rel="stylesheet" href="./assets/css/site.css">
+    
+    <style>
+        .contact-box {
+            background: white; border-radius: 16px; padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .info-item {
+            display: flex; align-items: flex-start; gap: 15px; margin-bottom: 30px;
+        }
+        .info-icon {
+            width: 50px; height: 50px; background: #eef2ff; color: #4f46e5;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; flex-shrink: 0;
+        }
+        .map-frame {
+            width: 100%; height: 300px; border-radius: 16px; border: 0;
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <div id="site-header"></div>
+    <div id="site-sidebar"></div>
+
+    <main class="page-content">
+        <div class="container-fluid p-4">
+            
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-dark">Fale Conosco</h2>
+                <p class="text-muted">Dúvidas, sugestões ou problemas técnicos? Estamos aqui para ajudar.</p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                
+                <div class="col-lg-4">
+                    <div class="contact-box h-100">
+                        <h4 class="fw-bold mb-4">Canais de Atendimento</h4>
+                        
+                        <div class="info-item">
+                            <div class="info-icon"><i class='bx bx-map'></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Endereço</h6>
+                                <p class="text-muted small mb-0">Av. do Conhecimento, 1000<br>Centro, São Paulo - SP</p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon"><i class='bx bx-envelope'></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">E-mail</h6>
+                                <p class="text-muted small mb-0">suporte@ava3.com.br</p>
+                                <p class="text-muted small mb-0">comercial@ava3.com.br</p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon"><i class='bx bxl-whatsapp'></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">WhatsApp</h6>
+                                <p class="text-muted small mb-0">(11) 99999-0000</p>
+                                <small class="text-success">Seg a Sex, das 8h às 18h</small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <div class="ratio ratio-1x1" style="max-height: 200px;">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1975!2d-46.652!3d-23.564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDMzJzUxLjYiUyA0NsKwMzknMDcuMiJX!5e0!3m2!1spt-BR!2sbr!4v1600000000000!5m2!1spt-BR!2sbr" class="rounded-3" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="contact-box">
+                        <h4 class="fw-bold mb-4">Envie sua Mensagem</h4>
+                        <form id="formContact">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Nome</label>
+                                    <input type="text" id="contact_name" class="form-control" required placeholder="Seu nome">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">E-mail</label>
+                                    <input type="email" id="contact_email" class="form-control" required placeholder="seu@email.com">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Assunto</label>
+                                    <select id="contact_subject" class="form-select">
+                                        <option value="Suporte Técnico">🛠️ Suporte Técnico</option>
+                                        <option value="Financeiro">💰 Financeiro</option>
+                                        <option value="Sugestão">💡 Sugestão</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Mensagem</label>
+                                    <textarea id="contact_message" class="form-control" rows="5" required placeholder="Como podemos ajudar?"></textarea>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-primary fw-bold px-5 py-2 shadow-sm">
+                                        Enviar Mensagem <i class='bx bx-send ms-2'></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./assets/js/chrome.js"></script>
+    
+    <script type="module">
+        import { supabase } from './assets/js/supabaseClient.js';
+
+        // Preenche dados se logado
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                const user = session.user;
+                document.getElementById('contact_email').value = user.email;
+                
+                // Tenta pegar o nome do perfil
+                const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single();
+                if (profile?.name) document.getElementById('contact_name').value = profile.name;
+            }
+        });
+
+        // Enviar
+        document.getElementById('formContact').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Enviando...';
+
+            const payload = {
+                name: document.getElementById('contact_name').value,
+                email: document.getElementById('contact_email').value,
+                subject: document.getElementById('contact_subject').value,
+                message: document.getElementById('contact_message').value
+            };
+
+            // Se estiver logado, atrela o ID
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) payload.user_id = session.user.id;
+
+            const { error } = await supabase.from('contact_messages').insert(payload);
+
+            if (error) {
+                alert("Erro ao enviar: " + error.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            } else {
+                alert("✅ Mensagem enviada com sucesso! Entraremos em contato em breve.");
+                e.target.reset();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

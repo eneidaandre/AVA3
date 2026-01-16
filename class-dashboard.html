@@ -16,14 +16,33 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: bold; color: #495057;
         }
-        .post-card {
-            border-left: 4px solid transparent;
-            transition: transform 0.2s;
-        }
+        /* Badges Sutis */
+        .badge-subtle-success { background-color: #d1fae5; color: #065f46; }
+        .badge-subtle-warning { background-color: #fef3c7; color: #92400e; }
+        .badge-subtle-danger  { background-color: #fee2e2; color: #991b1b; }
+        .badge-subtle-primary { background-color: #dbeafe; color: #1e40af; }
+        .badge-subtle-secondary { background-color: #f3f4f6; color: #1f2937; }
+
+        .post-card { border-left: 4px solid transparent; transition: transform 0.2s; }
         .post-card:hover { transform: translateY(-2px); }
         .post-AVISO { border-left-color: #ffc107; }
         .post-MATERIAL { border-left-color: #0d6efd; }
         .post-EVENTO { border-left-color: #198754; }
+        
+        /* Tarefas da Equipe */
+        .task-internal-item { border-left: 3px solid #6366f1; transition: 0.2s; }
+        .task-internal-item.done { border-left-color: #ccc; opacity: 0.6; }
+        .task-internal-item.done .task-text { text-decoration: line-through; }
+        
+        /* Notificação (Sininho) */
+        .nav-link { position: relative; }
+        .notification-badge {
+            position: absolute; top: 5px; right: 5px;
+            padding: 2px 6px; border-radius: 50%;
+            background-color: #dc3545; color: white;
+            font-size: 0.65rem; font-weight: bold;
+            display: none; /* Oculto por padrão */
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -34,24 +53,40 @@
     <main class="page-content">
         <div class="container-fluid p-4">
 
-            <div class="d-flex justify-content-between align-items-end mb-4 bg-white p-4 rounded-4 shadow-sm border">
+            <div class="d-flex justify-content-between align-items-start mb-4 bg-white p-4 rounded-4 shadow-sm border">
                 <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="d-flex align-items-center gap-2 mb-2">
                         <a href="class-manager.html" class="btn btn-sm btn-light border rounded-circle"><i class='bx bx-arrow-back'></i></a>
                         <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25" id="dash-code">---</span>
                         <small class="text-muted fw-bold text-uppercase" id="dash-course-name">Carregando...</small>
                     </div>
                     <h2 class="fw-bold text-dark mb-0" id="dash-class-name">...</h2>
-                    <div class="d-flex align-items-center gap-3 mt-2 text-muted small">
+                    <div class="d-flex align-items-center gap-3 mt-3 text-muted small">
                         <span id="dash-dates"><i class='bx bx-calendar'></i> -</span>
                         <a href="#" target="_blank" id="dash-whatsapp" class="text-decoration-none text-success fw-bold" style="display:none">
                             <i class='bx bxl-whatsapp fs-5 align-middle'></i> Grupo WhatsApp
                         </a>
                     </div>
                 </div>
-                <div class="text-end">
-                    <h3 class="fw-bold mb-0" id="dash-total-students">0</h3>
-                    <small class="text-muted">Alunos Matriculados</small>
+                
+                <div class="d-flex gap-4 align-items-center">
+                    <div class="text-end border-end pe-4">
+                        <h3 class="fw-bold mb-0" id="dash-total-students">0</h3>
+                        <small class="text-muted">Alunos</small>
+                    </div>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-light border shadow-sm px-3 py-2" type="button" data-bs-toggle="dropdown" title="Configurações">
+                            <i class='bx bx-cog fs-5 align-middle'></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><h6 class="dropdown-header">Gestão da Turma</h6></li>
+                            <li><button class="dropdown-item" onclick="openEditClassModal()"><i class='bx bx-edit me-2'></i> Editar Dados</button></li>
+                            <li><button class="dropdown-item" onclick="openCertificates()"><i class='bx bx-certification me-2'></i> Certificados</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item text-danger" onclick="deleteClass()"><i class='bx bx-trash me-2'></i> Excluir Turma</button></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -62,8 +97,14 @@
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link fw-bold px-4" data-bs-toggle="tab" data-bs-target="#tab-wall">
+                    <button class="nav-link fw-bold px-4" data-bs-toggle="tab" data-bs-target="#tab-wall" onclick="loadPosts()">
                         <i class='bx bx-news'></i> Mural & Avisos
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-bold px-4 text-indigo" data-bs-toggle="tab" data-bs-target="#tab-team" onclick="loadTeamTasks()">
+                        <i class='bx bx-bell'></i> Notas da Equipe
+                        <span id="team-notification-badge" class="notification-badge">0</span>
                     </button>
                 </li>
             </ul>
@@ -72,7 +113,6 @@
                 
                 <div class="tab-pane fade show active" id="tab-students">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                        
                         <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
                             <h6 class="fw-bold mb-0">Lista de Estudantes</h6>
                             <div class="d-flex gap-2">
@@ -85,25 +125,22 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
                                         <th class="ps-4">Aluno</th>
+                                        <th>Perfil</th>
                                         <th>Status</th>
                                         <th>Progresso</th>
-                                        <th>Data Inscrição</th>
+                                        <th class="text-center">Data Inscrição</th>
                                         <th class="text-end pe-4">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody id="students-table-body">
-                                    </tbody>
+                                <tbody id="students-table-body"></tbody>
                             </table>
                         </div>
-                        <div id="students-empty" class="text-center py-5" style="display:none">
-                            <p class="text-muted">Nenhum aluno matriculado ainda.</p>
-                        </div>
+                        <div id="students-empty" class="text-center py-5" style="display:none"><p class="text-muted">Nenhum aluno matriculado ainda.</p></div>
                     </div>
                 </div>
 
@@ -111,49 +148,50 @@
                     <div class="row g-4">
                         <div class="col-lg-4">
                             <div class="card border-0 shadow-sm rounded-4 position-sticky" style="top: 20px;">
-                                <div class="card-header bg-white py-3 border-bottom">
-                                    <h6 class="fw-bold mb-0"><i class='bx bx-edit'></i> Novo Publicação</h6>
-                                </div>
+                                <div class="card-header bg-white py-3 border-bottom"><h6 class="fw-bold mb-0"><i class='bx bx-edit'></i> Novo Publicação</h6></div>
                                 <div class="card-body">
                                     <form id="formPost">
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Tipo</label>
-                                            <select id="post_type" class="form-select form-select-sm">
-                                                <option value="AVISO">📢 Aviso Geral</option>
-                                                <option value="MATERIAL">📚 Material Extra (Link/PDF)</option>
-                                                <option value="EVENTO">📅 Evento / Aula ao Vivo</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Título</label>
-                                            <input type="text" id="post_title" class="form-control" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Mensagem</label>
-                                            <textarea id="post_content" class="form-control" rows="3"></textarea>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Link (Opcional)</label>
-                                            <input type="url" id="post_url" class="form-control form-control-sm" placeholder="https://...">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Data (Opcional)</label>
-                                            <input type="datetime-local" id="post_date" class="form-control form-control-sm">
-                                        </div>
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" id="post_pinned">
-                                            <label class="form-check-label small">Fixar no topo</label>
-                                        </div>
+                                        <div class="mb-3"><label class="form-label small fw-bold">Tipo</label><select id="post_type" class="form-select form-select-sm"><option value="AVISO">📢 Aviso Geral</option><option value="MATERIAL">📚 Material Extra</option><option value="EVENTO">📅 Evento</option></select></div>
+                                        <div class="mb-3"><label class="form-label small fw-bold">Título</label><input type="text" id="post_title" class="form-control" required></div>
+                                        <div class="mb-3"><label class="form-label small fw-bold">Mensagem</label><textarea id="post_content" class="form-control" rows="3"></textarea></div>
+                                        <div class="mb-3"><label class="form-label small fw-bold">Link (Opcional)</label><input type="url" id="post_url" class="form-control form-control-sm"></div>
+                                        <div class="mb-3"><label class="form-label small fw-bold">Data (Opcional)</label><input type="datetime-local" id="post_date" class="form-control form-control-sm"></div>
+                                        <div class="form-check mb-3"><input class="form-check-input" type="checkbox" id="post_pinned"><label class="form-check-label small">Fixar no topo</label></div>
                                         <button type="submit" class="btn btn-primary w-100 fw-bold">Publicar</button>
                                     </form>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-8"><div id="posts-feed" class="d-flex flex-column gap-3"><div class="text-center py-5"><div class="spinner-border text-primary"></div></div></div></div>
+                    </div>
+                </div>
 
+                <div class="tab-pane fade" id="tab-team">
+                    <div class="row justify-content-center">
                         <div class="col-lg-8">
-                            <div id="posts-feed" class="d-flex flex-column gap-3">
-                                <div class="text-center py-5">
-                                    <div class="spinner-border text-primary" role="status"></div>
+                            <div class="card border-0 shadow-sm rounded-4">
+                                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold mb-0 text-indigo"><i class='bx bx-list-check'></i> Tarefas & Pendências</h6>
+                                </div>
+                                <div class="card-body bg-light">
+                                    <form id="formTeamTask" class="mb-4">
+                                        <div class="d-flex gap-2">
+                                            <div class="flex-grow-1">
+                                                <input type="text" id="team_task_input" class="form-control" placeholder="Descreva a tarefa..." required>
+                                            </div>
+                                            <div style="width: 200px;">
+                                                <select id="team_task_assignee" class="form-select text-muted">
+                                                    <option value="">Para: Equipe Geral</option>
+                                                    </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-indigo fw-bold text-white" style="background-color: #6366f1;">
+                                                <i class='bx bx-plus'></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
+                                    <div id="team-tasks-list" class="d-flex flex-column gap-2">
+                                        </div>
                                 </div>
                             </div>
                         </div>
@@ -164,58 +202,36 @@
         </div>
     </main>
 
-    <div class="modal fade" id="modalAddStudent" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-white border-bottom">
-                    <h5 class="modal-title fw-bold">Matricular Aluno</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body bg-light">
-                    <label class="form-label small fw-bold">Buscar Usuário</label>
-                    <div class="input-group mb-3">
-                        <input type="text" id="search-student-input" class="form-control" placeholder="Digite nome ou email...">
-                        <button class="btn btn-primary" onclick="searchStudentToEnroll()">
-                            <i class='bx bx-search'></i>
-                        </button>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Resultados</small>
-                        <small class="text-muted" id="search-status"></small>
-                    </div>
-
-                    <div id="student-search-results-list" class="d-flex flex-column gap-2" style="max-height: 300px; overflow-y: auto;">
-                        <div class="text-center py-4 text-muted small border rounded bg-white">
-                            Digite algo para buscar...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <template id="tpl-student-row">
         <tr>
             <td class="ps-4">
                 <div class="d-flex align-items-center gap-3">
                     <div class="student-avatar">AB</div>
-                    <div>
-                        <div class="fw-bold text-dark student-name">Nome</div>
-                        <small class="text-muted student-email">email</small>
-                    </div>
+                    <div><div class="fw-bold text-dark student-name">Nome</div><small class="text-muted student-email">email</small></div>
                 </div>
             </td>
-            <td><span class="badge student-status">Status</span></td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle profile-role-btn fw-bold" type="button" data-bs-toggle="dropdown" style="font-size: 0.75rem;">
+                        Estudante
+                    </button>
+                    <ul class="dropdown-menu shadow">
+                        <li><h6 class="dropdown-header">Alterar Perfil</h6></li>
+                        <li><a class="dropdown-item" href="#" data-role="aluno">🎓 Estudante</a></li>
+                        <li><a class="dropdown-item" href="#" data-role="tutor">🤝 Tutor</a></li>
+                        <li><a class="dropdown-item" href="#" data-role="professor">👨‍🏫 Professor</a></li>
+                        <li><a class="dropdown-item text-danger" href="#" data-role="gerente">🏗️ Gerente</a></li>
+                    </ul>
+                </div>
+            </td>
+            <td><span class="badge rounded-pill student-status">Status</span></td>
             <td>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="progress flex-grow-1" style="height: 6px; width: 80px;">
-                        <div class="progress-bar bg-success student-progress-bar" style="width: 0%"></div>
-                    </div>
+                    <div class="progress flex-grow-1" style="height: 6px; width: 80px;"><div class="progress-bar bg-success student-progress-bar" style="width: 0%"></div></div>
                     <small class="fw-bold student-progress-text">0%</small>
                 </div>
             </td>
-            <td class="text-muted small student-date">--/--/--</td>
+            <td class="text-muted small text-center student-date">--/--/--</td>
             <td class="text-end pe-4">
                 <button class="btn btn-sm btn-success btn-approve" title="Aprovar" style="display:none"><i class='bx bx-check'></i></button>
                 <button class="btn btn-sm btn-outline-danger btn-remove" title="Remover"><i class='bx bx-trash'></i></button>
@@ -223,23 +239,27 @@
         </tr>
     </template>
 
-    <template id="tpl-post-card">
-        <div class="card shadow-sm border-0 post-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="badge post-badge">TIPO</span>
-                    <small class="text-muted post-date">Há 2 horas</small>
+    <template id="tpl-team-task">
+        <div class="card bg-white border-0 shadow-sm task-internal-item">
+            <div class="card-body p-3 d-flex align-items-center gap-3">
+                <div class="form-check">
+                    <input class="form-check-input task-check" type="checkbox" style="transform: scale(1.3); cursor: pointer;">
                 </div>
-                <h5 class="fw-bold post-title">Título</h5>
-                <p class="text-muted mb-2 post-content">Conteúdo...</p>
-                <div class="post-extras mt-3 pt-3 border-top" style="display:none">
-                    <a href="#" target="_blank" class="btn btn-sm btn-outline-primary post-link me-2" style="display:none"><i class='bx bx-link-external'></i> Acessar</a>
-                    <span class="badge bg-light text-dark border post-event-date" style="display:none"><i class='bx bx-calendar'></i> <span>Data</span></span>
+                <div class="flex-grow-1">
+                    <div class="fw-bold text-dark task-text">Descrição da tarefa</div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <small class="text-primary fw-bold task-assignee"><i class='bx bx-user'></i> Geral</small>
+                        <small class="text-muted task-meta" style="font-size: 0.7rem;">Criado em --/--</small>
+                    </div>
                 </div>
-                <button class="btn btn-sm text-danger position-absolute top-0 end-0 m-2 btn-delete-post"><i class='bx bx-x fs-5'></i></button>
+                <button class="btn btn-sm text-danger btn-delete-task"><i class='bx bx-trash'></i></button>
             </div>
         </div>
     </template>
+
+    <div class="modal fade" id="modalEditClass" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content border-0 shadow"><div class="modal-header bg-white border-bottom"><h5 class="modal-title fw-bold">Editar Turma</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body bg-light"><form id="formEditClass"><div class="card border-0 shadow-sm mb-3"><div class="card-body"><h6 class="fw-bold border-bottom pb-2 mb-3">Dados Principais</h6><div class="row g-3"><div class="col-md-8"><label class="form-label small fw-bold">Nome</label><input type="text" id="edit_class_name" class="form-control" required></div><div class="col-md-4"><label class="form-label small fw-bold">Código</label><input type="text" id="edit_class_code" class="form-control" readonly disabled></div><div class="col-md-6"><label class="form-label small fw-bold">Início</label><input type="date" id="edit_start_date" class="form-control"></div><div class="col-md-6"><label class="form-label small fw-bold">Fim</label><input type="date" id="edit_end_date" class="form-control"></div></div></div></div><div class="card border-0 shadow-sm mb-3"><div class="card-body"><h6 class="fw-bold border-bottom pb-2 mb-3">Inscrição</h6><div class="row g-3"><div class="col-md-6"><label class="form-label small fw-bold">Início</label><input type="date" id="edit_enrollment_start" class="form-control"></div><div class="col-md-6"><label class="form-label small fw-bold">Fim</label><input type="date" id="edit_enrollment_deadline" class="form-control"></div><div class="col-12 mt-3"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="edit_enrollment_open"><label class="form-check-label fw-bold">Inscrições Abertas</label></div><div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" id="edit_is_hidden"><label class="form-check-label text-danger">Ocultar Turma</label></div></div></div></div></div><div class="modal-footer border-top-0 px-0 pb-0"><button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary fw-bold px-4">Salvar</button></div></form></div></div></div></div>
+    <div class="modal fade" id="modalAddStudent" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content border-0 shadow"><div class="modal-header bg-white border-bottom"><h5 class="modal-title fw-bold">Matricular Aluno</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body bg-light"><div class="input-group mb-3"><input type="text" id="search-student-input" class="form-control" placeholder="Buscar..."><button class="btn btn-primary" onclick="searchStudentToEnroll()"><i class='bx bx-search'></i></button></div><div id="student-search-results-list" class="d-flex flex-column gap-2"></div></div></div></div></div>
+    <template id="tpl-post-card"><div class="card shadow-sm border-0 post-card mb-3"><div class="card-body"><div class="d-flex justify-content-between mb-2"><span class="badge post-badge">TIPO</span><small class="text-muted post-date">Há 2 horas</small></div><h5 class="fw-bold post-title">Título</h5><p class="text-muted mb-2 post-content">Conteúdo...</p><div class="post-extras mt-3 pt-3 border-top" style="display:none"><a href="#" target="_blank" class="btn btn-sm btn-outline-primary post-link me-2" style="display:none"><i class='bx bx-link-external'></i> Acessar</a><span class="badge bg-light text-dark border post-event-date" style="display:none"><i class='bx bx-calendar'></i> <span>Data</span></span></div><button class="btn btn-sm text-danger position-absolute top-0 end-0 m-2 btn-delete-post"><i class='bx bx-x fs-5'></i></button></div></div></template>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./assets/js/chrome.js"></script>
